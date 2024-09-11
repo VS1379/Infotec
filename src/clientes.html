@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clientes</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <header>
+        <h1>Clientes</h1>
+        <a href="index.html">Volver al inicio</a>
+    </header>
+    <section>
+        <h2>Consultar Clientes</h2>
+        <form id="getAllClientesForm">
+            <button type="submit">Obtener Todos</button>
+        </form>
+        <h2>Agregar Cliente</h2>
+        <form id="createClienteForm">
+            <label>DNI: <input type="text" id="dni" required></label>
+            <label>CUIT: <input type="text" id="cuit" required></label>
+            <label>Nombre: <input type="text" id="nombre" required></label>
+            <label>Dirección: <input type="text" id="direccion" required></label>
+            <label>Teléfono: <input type="text" id="telefono" required></label>
+            <label>Correo: <input type="email" id="correo" required></label>
+            <button type="submit">Agregar Cliente</button>
+        </form>
+        <h2>Actualizar Cliente</h2>
+        <form id="updateClienteForm">
+            <label>ID: <input type="text" id="updateId" required></label>
+            <label>DNI: <input type="text" id="updateDni"></label>
+            <label>CUIT: <input type="text" id="updateCuit"></label>
+            <label>Nombre: <input type="text" id="updateNombre"></label>
+            <label>Dirección: <input type="text" id="updateDireccion"></label>
+            <label>Teléfono: <input type="text" id="updateTelefono"></label>
+            <label>Correo: <input type="email" id="updateCorreo"></label>
+            <button type="submit">Actualizar Cliente</button>
+        </form>
+        <h2>Eliminar Cliente</h2>
+        <form id="deleteClienteForm">
+            <label>ID: <input type="text" id="deleteId" required></label>
+            <button type="submit">Eliminar Cliente</button>
+        </form>
+        <div id="response"></div>
+    </section>
+    <script src="scriptsClientes.js"></script>
+</body>
+
+</html>

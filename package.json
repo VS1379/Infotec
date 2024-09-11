@@ -1,0 +1,35 @@
+{
+  "name": "infotec",
+  "version": "1.0.0",
+  "description": "Informatic Store",
+  "main": "./src/app.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "node --watch ./src/app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/VS1379/Infotec.git"
+  },
+  "keywords": [
+    "Infotec"
+  ],
+  "author": "VS1379",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/VS1379/Infotec/issues"
+  },
+  "homepage": "https://github.com/VS1379/Infotec#readme",
+  "devDependencies": {
+    "standart": "^6.1.0"
+  },
+  "eslindconfig": {
+    "extends": "standart"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "4.19.2",
+    "mysql2": "^3.11.1"
+  }
+}

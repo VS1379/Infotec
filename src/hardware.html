@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hardware</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <header>
+        <h1>Hardware</h1>
+        <a href="index.html">Volver al inicio</a>
+    </header>
+    <section>
+        <h2>Consultar Hardware</h2>
+        <form id="getAllHardwareForm">
+            <button type="submit">Obtener Todos</button>
+        </form>
+        <h2>Agregar Hardware</h2>
+        <form id="createHardwareForm">
+            <!-- Agrega los campos necesarios aquí -->
+            <label>ID Tipo: <input type="text" id="tipo" required></label>
+            <label>ID Marca: <input type="text" id="marca" required></label>
+            <label>Características: <input type="text" id="caracteristicas" required></label>
+            <label>Precio Unitario: <input type="number" step="0.01" id="precio" required></label>
+            <label>Unidades Disponibles: <input type="number" id="unidades" required></label>
+            <button type="submit">Agregar Hardware</button>
+        </form>
+        <h2>Actualizar Hardware</h2>
+        <form id="updateHardwareForm">
+            <!-- Agrega los campos necesarios aquí -->
+            <label>ID: <input type="text" id="updateId" required></label>
+            <label>ID Tipo: <input type="text" id="updateTipo"></label>
+            <label>ID Marca: <input type="text" id="updateMarca"></label>
+            <label>Características: <input type="text" id="updateCaracteristicas"></label>
+            <label>Precio Unitario: <input type="number" step="0.01" id="updatePrecio"></label>
+            <label>Unidades Disponibles: <input type="number" id="updateUnidades"></label>
+            <button type="submit">Actualizar Hardware</button>
+        </form>
+        <h2>Eliminar Hardware</h2>
+        <form id="deleteHardwareForm">
+            <label>ID: <input type="text" id="deleteId" required></label>
+            <button type="submit">Eliminar Hardware</button>
+        </form>
+        <div id="response"></div>
+    </section>
+    <script src="scriptsHardware.js"></script>
+</body>
+
+</html>

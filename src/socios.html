@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Socios</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <header>
+        <h1>Socios</h1>
+        <a href="index.html">Volver al inicio</a>
+    </header>
+    <section>
+        <h2>Consultar Socios</h2>
+        <form id="getAllSociosForm">
+            <button type="submit">Obtener Todos</button>
+        </form>
+        <h2>Agregar Socio</h2>
+        <form id="createSocioForm">
+            <!-- Agrega los campos necesarios aquí -->
+            <label>DNI: <input type="text" id="dni" required></label>
+            <label>Apellido y Nombre: <input type="text" id="nombre" required></label>
+            <label>Dirección: <input type="text" id="direccion" required></label>
+            <label>Teléfono: <input type="text" id="telefono" required></label>
+            <label>Correo: <input type="email" id="correo" required></label>
+            <label>Socio Gerente: <input type="checkbox" id="gerente"></label>
+            <button type="submit">Agregar Socio</button>
+        </form>
+        <h2>Actualizar Socio</h2>
+        <form id="updateSocioForm">
+            <!-- Agrega los campos necesarios aquí -->
+            <label>ID: <input type="text" id="updateId" required></label>
+            <label>DNI: <input type="text" id="updateDni"></label>
+            <label>Apellido y Nombre: <input type="text" id="updateNombre"></label>
+            <label>Dirección: <input type="text" id="updateDireccion"></label>
+            <label>Teléfono: <input type="text" id="updateTelefono"></label>
+            <label>Correo: <input type="email" id="updateCorreo"></label>
+            <label>Socio Gerente: <input type="checkbox" id="updateGerente"></label>
+            <button type="submit">Actualizar Socio</button>
+        </form>
+        <h2>Eliminar Socio</h2>
+        <form id="deleteSocioForm">
+            <label>ID: <input type="text" id="deleteId" required></label>
+            <button type="submit">Eliminar Socio</button>
+        </form>
+        <div id="response"></div>
+    </section>
+    <script src="scriptsSocios.js"></script>
+</body>
+
+</html>
