@@ -4,12 +4,12 @@ import { sociosRouter } from '../routes/socios.js';
 import { proveedoresRouter } from '../routes/proveedores.js';
 import { hardwareRouter } from '../routes/hardware.js';
 import cors from 'cors'
-// import { corsMiddleware } from '../middlewares/cors.js';
-
 
 const app = express();
+
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 app.use("/clientes", clientesRouter);
 app.use("/socios", sociosRouter);

@@ -37,7 +37,7 @@ document
     event.preventDefault();
     const cliente = {
       dni: document.getElementById("dni").value,
-      cuit: document.getElementById("cuit").value, // Se incluye el campo CUIT
+      cuit: document.getElementById("cuit").value,
       nombre: document.getElementById("nombre").value,
       direccion: document.getElementById("direccion").value,
       telefono: document.getElementById("telefono").value,
@@ -45,7 +45,7 @@ document
     };
     console.log(cliente);
 
-    fetch("http://localhost:3001/clientes/clientes", {
+    fetch("http://localhost:3001/clientes/clientesCrear", { // Cambiar a la ruta correcta
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -70,7 +70,7 @@ document
     const telefono = document.getElementById("updateTelefono").value;
     const correo = document.getElementById("updateCorreo").value;
 
-    // Solo agregar los campos si tienen valor
+    // Agregar solo si no estan vacios
     if (dni) cliente.dni = dni;
     if (cuit) cliente.cuit = cuit;
     if (nombre) cliente.nombre = nombre;
@@ -80,7 +80,7 @@ document
 
     const id = document.getElementById("updateId").value;
 
-    fetch(`http://localhost:3001/clientes/${id}`, {
+    fetch(`http://localhost:3001/clientes/clientes/${id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -103,7 +103,7 @@ document
       return;
     }
 
-    fetch(`http://localhost:3001/clientes/${id}`, {
+    fetch(`http://localhost:3001/clientes/clientes/${id}`, {
       method: "DELETE",
     })
       .then((response) => {
@@ -112,7 +112,11 @@ document
             "response"
           ).innerText = `Cliente con ID ${id} eliminado correctamente.`;
         } else {
-          throw new Error("Error al eliminar el cliente.");
+          response.text().then((text) => {
+            document.getElementById(
+              "response"
+            ).innerText = `Error: ${response.status} - ${text}`;
+          });
         }
       })
       .catch((err) => console.error("Error:", err));

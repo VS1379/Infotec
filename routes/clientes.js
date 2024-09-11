@@ -10,7 +10,7 @@ clientesRouter.get('/clientes', clienteController.getAll);
 clientesRouter.get('/clientes/:dni', clienteController.getById);
 
 // Crear un nuevo cliente
-clientesRouter.post('/clientes', clienteController.crear);
+clientesRouter.post('/clientesCrear', clienteController.crear);
 
 // Modificar un cliente existente
 clientesRouter.put('/clientes/:id', clienteController.modificar);

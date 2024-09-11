@@ -23,15 +23,19 @@ export class clienteController {
 
   static async crear(req, res) {
     try {
+      console.log("req.params");
+      console.log(req.params);
+      console.log("req.body");
+      console.log(req.body);
+
       const { dni, cuit, nombre, direccion, telefono, correo } = req.body;
       if (!dni || !cuit || !nombre || !direccion || !telefono || !correo) {
-        console.log(req.params);
         return res
           .status(400)
           .json({ message: "Todos los campos son obligatorios" });
       }
 
-      const nuevoCliente = await clienteModel.create({
+      const nuevoCliente = await clienteModel.crear({
         dni,
         cuit,
         nombre,
