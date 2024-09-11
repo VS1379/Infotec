@@ -1,0 +1,15 @@
+GET http://localhost:3001/hardware/ 
+###
+
+POST http://localhost:3001/clientes/clientes
+
+{
+    "dni": 44552343,
+    "cuit": 23445523439,
+    "nombre": "Valentin",
+    "direccion": "Pablito",
+    "telefono": 3898665544,
+    "correo": "as@gmail.com"
+}
+
+###

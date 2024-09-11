@@ -7,7 +7,7 @@ export const clientesRouter = Router();
 clientesRouter.get('/clientes', clienteController.getAll);
 
 // Obtener un cliente por ID
-clientesRouter.get('/clientes/:id', clienteController.getById);
+clientesRouter.get('/clientes/:dni', clienteController.getById);
 
 // Crear un nuevo cliente
 clientesRouter.post('/clientes', clienteController.crear);

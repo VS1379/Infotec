@@ -8,7 +8,7 @@ function handleResponse(response) {
 // Función para obtener todos los proveedores
 document.getElementById('getAllProveedoresForm').addEventListener('submit', function (event) {
     event.preventDefault();
-    fetch('http://localhost:3001/proveedores')
+    fetch('http://localhost:3001/proveedores/proveedorw')
         .then(handleResponse)
         .catch(err => console.error('Error:', err));
 });

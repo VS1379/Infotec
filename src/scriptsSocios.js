@@ -8,7 +8,7 @@ function handleResponse(response) {
 // Función para obtener todos los socios
 document.getElementById('getAllSociosForm').addEventListener('submit', function (event) {
     event.preventDefault();
-    fetch('http://localhost:3001/socios')
+    fetch('http://localhost:3001/socios/socio')
         .then(handleResponse)
         .catch(err => console.error('Error:', err));
 });

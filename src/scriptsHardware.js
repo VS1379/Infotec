@@ -23,7 +23,7 @@ document.getElementById('createHardwareForm').addEventListener('submit', functio
         precio: document.getElementById('precio').value,
         unidades: document.getElementById('unidades').value
     };
-    fetch('http://localhost:3001/hardware', {
+    fetch('http://localhost:3001/hardware/', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
