@@ -3,6 +3,7 @@ import { clientesRouter } from '../routes/clientes.js';
 import { sociosRouter } from '../routes/socios.js';
 import { proveedoresRouter } from '../routes/proveedores.js';
 import { hardwareRouter } from '../routes/hardware.js';
+//import validate from '../schemas/clientes/clientes.js'
 import cors from 'cors'
 
 const app = express();
