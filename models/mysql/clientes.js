@@ -17,7 +17,7 @@ export class clienteModel {
     }
 
     static async getById(dni) {
-        const [rows] = await connection.query('SELECT * FROM clientes WHERE dni = ?', [dni]);
+        const [rows] = await connection.query(`SELECT * FROM clientes WHERE dni =?`, [dni]);
         return rows[0];
     }
 

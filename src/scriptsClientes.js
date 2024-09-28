@@ -81,7 +81,7 @@ document
     const id = document.getElementById("updateId").value;
 
     fetch(`http://localhost:3001/clientes/clientes/${id}`, {
-      method: "PUT",
+      method: "PATCH",
       headers: {
         "Content-Type": "application/json",
       },

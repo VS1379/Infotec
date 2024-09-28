@@ -13,7 +13,7 @@ clientesRouter.get('/clientes/:dni', clienteController.getById);
 clientesRouter.post('/clientesCrear', clienteController.crear);
 
 // Modificar un cliente existente
-clientesRouter.put('/clientes/:id', clienteController.modificar);
+clientesRouter.patch('/clientes/:dni', clienteController.modificar);
 
 // Eliminar un cliente
-clientesRouter.delete('/clientes/:id', clienteController.eliminar);
+clientesRouter.delete('/clientes/:dni', clienteController.eliminar);
