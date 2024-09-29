@@ -29,14 +29,20 @@
             <button type="submit">Agregar Cliente</button>
         </form>
         <h2>Actualizar Cliente</h2>
-        <form id="updateClienteForm">
-            <label>ID: <input type="number" id="updateId" required></label>
-            <label>DNI: <input type="number" id="updateDni" min="11111111" max="99999999"></label>
-            <label>CUIT: <input type="number" id="updateCuit" min="11111111111" max="99999999999"></label>
-            <label>Nombre: <input type="text" id="updateNombre"></label>
-            <label>Dirección: <input type="text" id="updateDireccion"></label>
-            <label>Teléfono: <input type="number" id="updateTelefono" min="1111111111" max="999999999999"></label>
-            <label>Correo: <input type="email" id="updateCorreo"></label>
+        <form id="updateClienteFormById">
+            <label>DNI: <input type="number" id="updateDni" required min="11111111" max="99999999"></label>
+            <button type="submit">BUSCAR </button>
+            <button type="reset"><a href="clientes.html"
+                    style="text-decoration: none; color: white;">CANCELAR</a></button>
+            <div id="dontExist"></div>
+        </form>
+        <form id="updateClienteForm" hidden>
+            <label>CUIT: <input type="number" id="updateCuit" required min="11111111111" max="99999999999"></label>
+            <label>Nombre: <input type="text" id="updateNombre" required></label>
+            <label>Dirección: <input type="text" id="updateDireccion" required></label>
+            <label>Teléfono: <input type="number" id="updateTelefono" required min="1111111111"
+                    max="999999999999"></label>
+            <label>Correo: <input type="email" id="updateCorreo" required></label>
             <button type="submit">Actualizar Cliente</button>
         </form>
         <h2>Eliminar Cliente</h2>

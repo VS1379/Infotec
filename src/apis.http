@@ -19,4 +19,8 @@ DELETE http://localhost:3001/clientes/clientes/43552343
 GET http://localhost:3001/clientes/clientes/43552343
 
 ###
-PU
+PATCH http://localhost:3001/clientes/clientes/43552343
+
+{
+    
+}
