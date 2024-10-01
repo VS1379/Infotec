@@ -21,6 +21,20 @@ export class clienteController {
     }
   }
 
+  static async getByField(req, res) {
+    try {
+      const { field } = req.params.field;
+      const { data } = req.params.data;
+      const consulta = await clienteModel.getByField(field, data);
+      if (consulta) return res.json(consulta);
+      res
+        .status(404)
+        .json({ message: "No se encontro ningun cliente coincidente" });
+    } catch (error) {
+      res.status(505).json({ message: "Error al obtener el cliente" });
+    }
+  }
+
   static async crear(req, res) {
     try {
       console.log("req.params");

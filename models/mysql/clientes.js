@@ -21,6 +21,11 @@ export class clienteModel {
         return rows[0];
     }
 
+    static async getByField(field, data) {
+        const [rows] = await connection.query(`SELECT * FROM clientes ? LIKE ?`, [field, `%{data}%`]);
+        return rows[0];
+    }
+
     static async crear(cliente) {
         const { dni, cuit, nombre, direccion, telefono, correo } = cliente;
         const [result] = await connection.query(

@@ -7,41 +7,11 @@ function handleResponse(response) {
     response.text().then((text) => {
       responseDiv.innerHTML = `<div style="color: red;">Error: ${response.status} - ${text}</div>`;
     });
-  } else {
-    response
-      .json()
-      .then((data) => {
-        if (data.DNI) {
-          responseDiv.innerHTML = `
-            <div style="border: 1px solid #ccc; padding: 10px; margin: 5px;">
-              <p>Cliente ${data.NOMBRE ? 'actualizado' : 'agregado'}:</p>
-              <p>DNI: ${data.DNI || 'N/A'}</p>
-              <p>Nombre: ${data.NOMBRE || 'N/A'}</p>
-              <p>CUIT: ${data.CUIT || 'N/A'}</p>
-              <p>Teléfono: ${data.TELEFONO || 'N/A'}</p>
-              <p>Correo: ${data.CORREO || 'N/A'}</p>
-            </div>
-          `;
-        } else if (Array.isArray(data)) {
-          // Si es una lista de clientes
-          const html = data.map(cliente => `
-            <div style="border: 1px solid #ccc; padding: 10px; margin: 5px;">
-              <p>DNI: ${cliente.DNI || 'N/A'}</p>
-              <p>Nombre: ${cliente.NOMBRE || 'N/A'}</p>
-              <p>CUIT: ${cliente.CUIT || 'N/A'}</p>
-              <p>Teléfono: ${cliente.TELEFONO || 'N/A'}</p>
-              <p>Correo: ${cliente.CORREO || 'N/A'}</p>
-            </div>
-          `).join("");
-          responseDiv.innerHTML = html;
-        } else {
-          responseDiv.innerHTML = `<div>Operacion Realizada Con Exito.</div>`;
-        }
-      })
-      .catch((err) => console.error("Error en la respuesta:", err));
+    return false; // Hubo un error
   }
-}
 
+  return true; // Respuesta correcta
+}
 
 // Función para obtener todos los clientes
 document
@@ -49,7 +19,34 @@ document
   .addEventListener("submit", function (event) {
     event.preventDefault();
     fetch("http://localhost:3001/clientes/clientes")
-      .then(handleResponse)
+      .then((response) => {
+        if (response) {
+          return response.json(); // Convierte la respuesta a JSON
+        }
+      })
+      .then((data) => {
+        if (Array.isArray(data)) {
+          const responseDiv = document.getElementById("response");
+          const html = data
+            .map(
+              (cliente) => `
+          <div style="border: 1px solid #ccc; padding: 10px; margin: 5px;">
+            <p>DNI: ${cliente.DNI || "N/A"}</p>
+            <p>Nombre: ${cliente.NOMBRE || "N/A"}</p>
+            <p>CUIT: ${cliente.CUIT || "N/A"}</p>
+            <p>Teléfono: ${cliente.TELEFONO || "N/A"}</p>
+            <p>Correo: ${cliente.CORREO || "N/A"}</p>
+          </div>
+        `
+            )
+            .join("");
+          responseDiv.innerHTML = html; // Muestra los clientes en el div
+        } else {
+          document.getElementById(
+            "response"
+          ).innerHTML = `<div>No se encontraron clientes.</div>`;
+        }
+      })
       .catch((err) => console.error("Error:", err));
   });
 
@@ -66,7 +63,6 @@ document
       telefono: document.getElementById("telefono").value,
       correo: document.getElementById("correo").value,
     };
-    console.log(cliente);
 
     fetch("http://localhost:3001/clientes/clientesCrear", {
       method: "POST",
@@ -75,7 +71,11 @@ document
       },
       body: JSON.stringify(cliente),
     })
-      .then(handleResponse)
+      .then((response) => {
+        if (handleResponse(response)) {
+          alert(`Agregado correctamente, DNI: ${cliente.dni}`);
+        }
+      })
       .catch((err) => console.error("Error:", err));
   });
 
@@ -84,29 +84,36 @@ document
   .getElementById("updateClienteFormById")
   .addEventListener("submit", function (event) {
     event.preventDefault();
-    fetch(`http://localhost:3001/clientes/clientes/${document.getElementById("updateDni").value}`)
+    fetch(
+      `http://localhost:3001/clientes/clientes/${
+        document.getElementById("updateDni").value
+      }`
+    )
       .then((data) => {
-        if (data.ok) {
-          data.json()
-            .then((data) => {
-              document.getElementById("dontExist").innerHTML = "";
-              document.getElementById("updateClienteForm").hidden = false;
-              document.getElementById("updateDni").readOnly = true;
-              document.getElementById("updateCuit").value = data.CUIT || 'N/A';
-              document.getElementById("updateNombre").value = data.NOMBRE || 'N/A';
-              document.getElementById("updateDireccion").value = data.DIRECCION || 'N/A';
-              document.getElementById("updateTelefono").value = data.TELEFONO || 'N/A';
-              document.getElementById("updateCorreo").value = data.CORREO || 'N/A';
-            })
-            .catch((err) => console.log("Error", err));
+        if (handleResponse(data)) {
+          data.json().then((data) => {
+            document.getElementById("dontExist").innerHTML = "";
+            document.getElementById("updateClienteForm").hidden = false;
+            document.getElementById("updateDni").readOnly = true;
+            document.getElementById("updateCuit").value = data.CUIT || "N/A";
+            document.getElementById("updateNombre").value =
+              data.NOMBRE || "N/A";
+            document.getElementById("updateDireccion").value =
+              data.DIRECCION || "N/A";
+            document.getElementById("updateTelefono").value =
+              data.TELEFONO || "N/A";
+            document.getElementById("updateCorreo").value =
+              data.CORREO || "N/A";
+          });
         } else {
-          document.getElementById("dontExist").innerHTML = "<br>EL CLIENTE NO EXISTE</br>";
+          document.getElementById("dontExist").innerHTML =
+            "<br>EL CLIENTE NO EXISTE</br>";
         }
       })
       .catch((err) => console.log("Error", err));
   });
 
-// Función para actualizar un cliente
+// Función para modificar un cliente
 document
   .getElementById("updateClienteForm")
   .addEventListener("submit", function (event) {
@@ -120,7 +127,6 @@ document
     const telefono = document.getElementById("updateTelefono").value;
     const correo = document.getElementById("updateCorreo").value;
 
-    // Agregar solo si no están vacíos
     if (dni) cliente.dni = dni;
     if (cuit) cliente.cuit = cuit;
     if (nombre) cliente.nombre = nombre;
@@ -135,7 +141,11 @@ document
       },
       body: JSON.stringify(cliente),
     })
-      .then(handleResponse)
+      .then((response) => {
+        if (handleResponse(response)) {
+          alert(`Modificado correctamente, DNI: ${dni}`);
+        }
+      })
       .catch((err) => console.error("Error:", err));
   });
 
@@ -144,7 +154,7 @@ document
   .getElementById("deleteClienteForm")
   .addEventListener("submit", function (event) {
     event.preventDefault();
-    const dni = document.getElementById("deleteId").value; // Cambiar a dni
+    const dni = document.getElementById("deleteId").value;
 
     if (!dni) {
       console.error("El DNI es requerido para eliminar un cliente.");
@@ -155,12 +165,8 @@ document
       method: "DELETE",
     })
       .then((response) => {
-        if (response.ok) {
-          document.getElementById("response").innerHTML = `<div style="color: green;">Cliente con DNI ${dni} eliminado correctamente.</div>`;
-        } else {
-          response.text().then((text) => {
-            document.getElementById("response").innerHTML = `<div style="color: red;">Error: ${response.status} - ${text}</div>`;
-          });
+        if (handleResponse(response)) {
+          alert(`Eliminado correctamente, DNI: ${dni}`);
         }
       })
       .catch((err) => console.error("Error:", err));
