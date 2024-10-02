@@ -18,10 +18,26 @@
         <form id="getAllClientesForm">
             <button type="submit">Obtener Todos</button>
         </form>
-        <h2>Consultar Clientes</h2>
-        <form id="getAllClientesForm">
-            <button type="submit">Obtener Todos</button>
+        <h2>Consultar Clientes Por Un Campo</h2>
+        <form id="getClientesByField">
+            <label for="field">Buscar por:</label>
+            <select id="field" name="field">
+                <option value="DNI">DNI</option>
+                <option value="CUIT">CUIT</option>
+                <option value="NOMBRE">Nombre</option>
+                <option value="DIRECCION">Dirección</option>
+                <option value="TELEFONO">Teléfono</option>
+                <option value="CORREO">Correo</option>
+            </select>
+
+            <label for="data">Valor:</label>
+            <input type="text" id="data" name="data" required />
+
+            <button type="submit">Buscar</button>
         </form>
+
+        <div id="response"></div> <!-- Aquí se mostrarán los resultados -->
+
         <h2>Agregar Cliente</h2>
         <form id="createClienteForm">
             <label>DNI: <input type="number" id="dni" required min="11111111" max="99999999"></label>

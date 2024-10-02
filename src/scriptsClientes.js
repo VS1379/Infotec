@@ -50,6 +50,53 @@ document
       .catch((err) => console.error("Error:", err));
   });
 
+// Función para obtener clientes por un campo específico
+document
+  .getElementById("getClientesByField")
+  .addEventListener("submit", function (event) {
+    event.preventDefault();
+
+    const field = document.getElementById("field").value;
+    const data = document.getElementById("data").value;
+
+    if (!data) {
+      document.getElementById("response").innerHTML = `<div>Por favor, ingresa un valor para buscar.</div>`;
+      return;
+    }
+
+    fetch(`http://localhost:3001/clientes/clientes/buscar/campo?field=${field}&data=${data}`)
+      .then((response) => {
+        if (response) {
+          return response.json();
+        }
+      })
+      .then((data) => {
+        console.log(data);
+        if (Array.isArray(data) && data.length > 0) {
+
+          const responseDiv = document.getElementById("response");
+          const html = data
+            .map(
+              (cliente) => `
+            <div style="border: 1px solid #ccc; padding: 10px; margin: 5px;">
+              <p>DNI: ${cliente.DNI || "N/A"}</p>
+              <p>Nombre: ${cliente.NOMBRE || "N/A"}</p>
+              <p>CUIT: ${cliente.CUIT || "N/A"}</p>
+              <p>Teléfono: ${cliente.TELEFONO || "N/A"}</p>
+              <p>Correo: ${cliente.CORREO || "N/A"}</p>
+              <p>Dirección: ${cliente.DIRECCION || "N/A"}</p>
+            </div>
+          `
+            )
+            .join("");
+          responseDiv.innerHTML = html;
+        } else {
+          document.getElementById("response").innerHTML = `<div>No se encontraron clientes.</div>`;
+        }
+      })
+      .catch((err) => console.error("Error:", err));
+  });
+
 // Función para agregar un cliente
 document
   .getElementById("createClienteForm")
@@ -85,8 +132,7 @@ document
   .addEventListener("submit", function (event) {
     event.preventDefault();
     fetch(
-      `http://localhost:3001/clientes/clientes/${
-        document.getElementById("updateDni").value
+      `http://localhost:3001/clientes/clientes/${document.getElementById("updateDni").value
       }`
     )
       .then((data) => {

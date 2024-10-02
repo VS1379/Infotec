@@ -25,10 +25,8 @@ PATCH http://localhost:3001/clientes/clientes/43552343
     
 }
 ###
-GET http://localhost:3001/clientes/clientes/
-{
- field: "DNI",
- data:4355
- }
+GET http://localhost:3001/clientes/clientes/buscar/campo?field=DNI&data=4
+
+
 
 ###

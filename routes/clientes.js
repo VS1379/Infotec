@@ -10,7 +10,7 @@ clientesRouter.get('/clientes', clienteController.getAll);
 clientesRouter.get('/clientes/:dni', clienteController.getById);
 
 // Obtener un cliente por campo
-clientesRouter.get('/clientes/:campo', clienteController.getByField);
+clientesRouter.get('/clientes/buscar/campo', clienteController.getByField);
 
 // Crear un nuevo cliente
 clientesRouter.post('/clientesCrear', clienteController.crear);

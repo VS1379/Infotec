@@ -23,15 +23,21 @@ export class clienteController {
 
   static async getByField(req, res) {
     try {
-      const { field } = req.params.field;
-      const { data } = req.params.data;
+      const { field, data } = req.query;
+      const validFields = ['DNI', 'CUIT', 'NOMBRE', 'DIRECCION', 'TELEFONO', 'CORREO'];
+      if (!validFields.includes(field)) {
+        return res.status(400).json({ message: 'Campo inválido para la búsqueda' });
+      }
+
       const consulta = await clienteModel.getByField(field, data);
-      if (consulta) return res.json(consulta);
-      res
-        .status(404)
-        .json({ message: "No se encontro ningun cliente coincidente" });
+
+      if (consulta.length > 0) {
+        return res.json(consulta);
+      } else {
+        res.status(404).json({ message: "No se encontró ningún cliente coincidente" });
+      }
     } catch (error) {
-      res.status(505).json({ message: "Error al obtener el cliente" });
+      res.status(500).json({ message: "Error al obtener el cliente" });
     }
   }
 
