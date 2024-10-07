@@ -49,7 +49,6 @@ document.getElementById("getAllProveedoresForm").addEventListener("submit", func
 document.getElementById("createProveedorForm").addEventListener("submit", function (event) {
     event.preventDefault();
     const proveedor = {
-        id_proveedor: document.getElementById("id_proveedor").value,
         cuit: document.getElementById("cuit").value,
         nombre: document.getElementById("nombre").value,
         direccion: document.getElementById("direccion").value,

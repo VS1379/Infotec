@@ -50,7 +50,6 @@ document.getElementById("getAllSociosForm").addEventListener("submit", function 
 document.getElementById("createSocioForm").addEventListener("submit", function (event) {
     event.preventDefault();
     const socio = {
-        id_socio: document.getElementById("id_socio").value,
         dni: document.getElementById("dni").value,
         apellido_nombre: document.getElementById("apellido_nombre").value,
         direccion: document.getElementById("direccion").value,
