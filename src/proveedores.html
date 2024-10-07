@@ -18,31 +18,38 @@
         <form id="getAllProveedoresForm">
             <button type="submit">Obtener Todos</button>
         </form>
+
+        <div id="response"></div> <!-- Aquí se mostrarán los resultados -->
+
         <h2>Agregar Proveedor</h2>
         <form id="createProveedorForm">
-            <!-- Agrega los campos necesarios aquí -->
-            <label>ID: <input type="text" id="id" required></label>
-            <label>CUIT: <input type="text" id="cuit" required></label>
-            <label>Nombre: <input type="text" id="nombre" required></label>
+            <label>ID: <input type="number" id="id_proveedor" required min="1" max="9999"></label>
+            <label>CUIT: <input type="number" id="cuit" required min="11111111111" max="99999999999"></label>
+            <label>Nombre o Razón Social: <input type="text" id="nombre" required></label>
             <label>Dirección: <input type="text" id="direccion" required></label>
             <label>Teléfono: <input type="text" id="telefono" required></label>
             <label>Correo: <input type="email" id="correo" required></label>
             <button type="submit">Agregar Proveedor</button>
         </form>
         <h2>Actualizar Proveedor</h2>
-        <form id="updateProveedorForm">
-            <!-- Agrega los campos necesarios aquí -->
-            <label>ID: <input type="text" id="updateId" required></label>
-            <label>CUIT: <input type="text" id="updateCuit"></label>
-            <label>Nombre: <input type="text" id="updateNombre"></label>
-            <label>Dirección: <input type="text" id="updateDireccion"></label>
-            <label>Teléfono: <input type="text" id="updateTelefono"></label>
-            <label>Correo: <input type="email" id="updateCorreo"></label>
+        <form id="updateProveedorFormById">
+            <label>ID: <input type="number" id="updateId" required min="1" max="9999"></label>
+            <button type="submit">BUSCAR </button>
+            <button type="reset"><a href="proveedores.html"
+                    style="text-decoration: none; color: white;">CANCELAR</a></button>
+            <div id="dontExist"></div>
+        </form>
+        <form id="updateProveedorForm" hidden>
+            <label>CUIT: <input type="number" id="updateCuit" required min="11111111111" max="99999999999"></label>
+            <label>Nombre o Razón Social: <input type="text" id="updateNombre" required></label>
+            <label>Dirección: <input type="text" id="updateDireccion" required></label>
+            <label>Teléfono: <input type="text" id="updateTelefono" required></label>
+            <label>Correo: <input type="email" id="updateCorreo" required></label>
             <button type="submit">Actualizar Proveedor</button>
         </form>
         <h2>Eliminar Proveedor</h2>
         <form id="deleteProveedorForm">
-            <label>ID: <input type="text" id="deleteId" required></label>
+            <label>ID: <input type="number" id="deleteId" required min="1" max="9999"></label>
             <button type="submit">Eliminar Proveedor</button>
         </form>
         <div id="response"></div>

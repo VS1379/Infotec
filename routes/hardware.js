@@ -1,19 +1,18 @@
-import express from 'express';
+import { Router } from 'express';
 import { hardwareController } from '../controllers/hardware.js';
+export const hardwareRouter = Router();
 
-export const hardwareRouter = express.Router();
-
-// Obtener todos los hardware
+// Obtener todo el hardware
 hardwareRouter.get('/', hardwareController.getAll);
 
 // Obtener hardware por ID
-hardwareRouter.get('/:id', hardwareController.getById);
+hardwareRouter.get('/:id_hard', hardwareController.getById);
 
 // Crear nuevo hardware
-hardwareRouter.post('/', hardwareController.crear);
+hardwareRouter.post('/hardwareCrear', hardwareController.crear);
 
 // Modificar hardware existente
-hardwareRouter.put('/:id', hardwareController.modificar);
+hardwareRouter.patch('/:id_hard', hardwareController.modificar);
 
-// Eliminar hardware por ID
-hardwareRouter.delete('/:id', hardwareController.eliminar);
+// Eliminar hardware
+hardwareRouter.delete('/:id_hard', hardwareController.eliminar);

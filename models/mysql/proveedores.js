@@ -16,31 +16,31 @@ export class proveedorModel {
         return rows;
     }
 
-    static async getById(id) {
-        const [rows] = await connection.query('SELECT * FROM proveedores WHERE idProveedor = ?', [id]);
-        return rows[0];
+    static async getById(id_proveedor) {
+        const [rows] = await connection.query('SELECT * FROM proveedores WHERE id_proveedor = ?', [id_proveedor]);
+        return rows;
     }
 
     static async crear(proveedor) {
-        const { idProveedor, cuit, nombre, direccion, telefono, correo } = proveedor;
+        const { id_proveedor, cuit, nombre, direccion, telefono, correo } = proveedor;
         const [result] = await connection.query(
-            'INSERT INTO proveedores (idProveedor, cuit, nombre, direccion, telefono, correo) VALUES (?, ?, ?, ?, ?, ?)',
-            [idProveedor, cuit, nombre, direccion, telefono, correo]
+            'INSERT INTO proveedores (id_proveedor, cuit, nombre, direccion, telefono, correo) VALUES (?, ?, ?, ?, ?, ?)',
+            [id_proveedor, cuit, nombre, direccion, telefono, correo]
         );
         return result;
     }
 
-    static async modificar(id, proveedor) {
+    static async modificar(id_proveedor, proveedor) {
         const { cuit, nombre, direccion, telefono, correo } = proveedor;
         const [result] = await connection.query(
-            'UPDATE proveedores SET cuit = ?, nombre = ?, direccion = ?, telefono = ?, correo = ? WHERE idProveedor = ?',
-            [cuit, nombre, direccion, telefono, correo, id]
+            'UPDATE proveedores SET cuit = ?, nombre = ?, direccion = ?, telefono = ?, correo = ? WHERE id_proveedor = ?',
+            [cuit, nombre, direccion, telefono, correo, id_proveedor]
         );
         return result;
     }
 
-    static async eliminar(id) {
-        const [result] = await connection.query('DELETE FROM proveedores WHERE idProveedor = ?', [id]);
+    static async eliminar(id_proveedor) {
+        const [result] = await connection.query('DELETE FROM proveedores WHERE id_proveedor = ?', [id_proveedor]);
         return result.affectedRows > 0;
     }
 }

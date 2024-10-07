@@ -1,10 +1,18 @@
-import { Router } from "express";
-import { proveedorController } from "../controllers/proveedores.js";
-
+import { Router } from 'express';
+import { proveedorController } from '../controllers/proveedores.js';
 export const proveedoresRouter = Router();
 
-proveedoresRouter.get("/proveedor", proveedorController.getAll);
-proveedoresRouter.get("/proveedor/:id", proveedorController.getById);
-proveedoresRouter.post("/proveedor", proveedorController.crear);
-proveedoresRouter.put("/proveedor/:id", proveedorController.modificar);
-proveedoresRouter.delete("/proveedor/:id", proveedorController.eliminar);
+// Obtener todos los proveedores
+proveedoresRouter.get('/', proveedorController.getAll);
+
+// Obtener proveedor por ID
+proveedoresRouter.get('/:id_proveedor', proveedorController.getById);
+
+// Crear nuevo proveedor
+proveedoresRouter.post('/proveedoresCrear', proveedorController.crear);
+
+// Modificar proveedor existente
+proveedoresRouter.patch('/:id_proveedor', proveedorController.modificar);
+
+// Eliminar proveedor
+proveedoresRouter.delete('/:id_proveedor', proveedorController.eliminar);

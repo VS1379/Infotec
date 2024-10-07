@@ -16,31 +16,31 @@ export class hardwareModel {
         return rows;
     }
 
-    static async getById(id) {
-        const [rows] = await connection.query('SELECT * FROM hardware WHERE idHard = ?', [id]);
-        return rows[0];
+    static async getById(id_hard) {
+        const [rows] = await connection.query('SELECT * FROM hardware WHERE id_hard = ?', [id_hard]);
+        return rows;
     }
 
     static async crear(hardware) {
-        const { idHard, idTipohard, idMarca, características, precioUnitario, unidadesDisponibles } = hardware;
+        const { id_hard, id_tipohard, id_marca, caracteristicas, precio_unitario, unidades_disponibles } = hardware;
         const [result] = await connection.query(
-            'INSERT INTO hardware (idHard, idTipohard, idMarca, características, precioUnitario, unidadesDisponibles) VALUES (?, ?, ?, ?, ?, ?)',
-            [idHard, idTipohard, idMarca, características, precioUnitario, unidadesDisponibles]
+            'INSERT INTO hardware (id_hard, id_tipohard, id_marca, caracteristicas, precio_unitario, unidades_disponibles) VALUES (?, ?, ?, ?, ?, ?)',
+            [id_hard, id_tipohard, id_marca, caracteristicas, precio_unitario, unidades_disponibles]
         );
         return result;
     }
 
-    static async modificar(id, hardware) {
-        const { idTipohard, idMarca, características, precioUnitario, unidadesDisponibles } = hardware;
+    static async modificar(id_hard, hardware) {
+        const { id_tipohard, id_marca, caracteristicas, precio_unitario, unidades_disponibles } = hardware;
         const [result] = await connection.query(
-            'UPDATE hardware SET idTipohard = ?, idMarca = ?, características = ?, precioUnitario = ?, unidadesDisponibles = ? WHERE idHard = ?',
-            [idTipohard, idMarca, características, precioUnitario, unidadesDisponibles, id]
+            'UPDATE hardware SET id_tipohard = ?, id_marca = ?, caracteristicas = ?, precio_unitario = ?, unidades_disponibles = ? WHERE id_hard = ?',
+            [id_tipohard, id_marca, caracteristicas, precio_unitario, unidades_disponibles, id_hard]
         );
         return result;
     }
 
-    static async eliminar(id) {
-        const [result] = await connection.query('DELETE FROM hardware WHERE idHard = ?', [id]);
+    static async eliminar(id_hard) {
+        const [result] = await connection.query('DELETE FROM hardware WHERE id_hard = ?', [id_hard]);
         return result.affectedRows > 0;
     }
 }

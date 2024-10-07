@@ -18,7 +18,7 @@ document
   .getElementById("getAllClientesForm")
   .addEventListener("submit", function (event) {
     event.preventDefault();
-    fetch("http://localhost:3001/clientes/clientes")
+    fetch("http://localhost:3001/clientes")
       .then((response) => {
         if (response) {
           return response.json(); // Convierte la respuesta a JSON
@@ -64,7 +64,7 @@ document
       return;
     }
 
-    fetch(`http://localhost:3001/clientes/clientes/buscar/campo?field=${field}&data=${data}`)
+    fetch(`http://localhost:3001/clientes/buscar/campo?field=${field}&data=${data}`)
       .then((response) => {
         if (response) {
           return response.json();
@@ -132,7 +132,7 @@ document
   .addEventListener("submit", function (event) {
     event.preventDefault();
     fetch(
-      `http://localhost:3001/clientes/clientes/${document.getElementById("updateDni").value
+      `http://localhost:3001/clientes/${document.getElementById("updateDni").value
       }`
     )
       .then((data) => {
@@ -180,7 +180,7 @@ document
     if (telefono) cliente.telefono = telefono;
     if (correo) cliente.correo = correo;
 
-    fetch(`http://localhost:3001/clientes/clientes/${dni}`, {
+    fetch(`http://localhost:3001/clientes/${dni}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -207,7 +207,7 @@ document
       return;
     }
 
-    fetch(`http://localhost:3001/clientes/clientes/${dni}`, {
+    fetch(`http://localhost:3001/clientes/${dni}`, {
       method: "DELETE",
     })
       .then((response) => {

@@ -1,10 +1,19 @@
-import { Router } from "express";
-import { socioController } from "../controllers/socios.js";
-
+import { Router } from 'express';
+import { socioController } from '../controllers/socios.js';
 export const sociosRouter = Router();
 
-sociosRouter.get("/socio", socioController.getAll);
-sociosRouter.get("/socio/:id", socioController.getById);
-sociosRouter.post("/socio", socioController.crear);
-sociosRouter.put("/socio/:id", socioController.modificar);
-sociosRouter.delete("/socio/:id", socioController.eliminar);
+// Obtener todos los socios
+sociosRouter.get('/', socioController.getAll);
+
+// Obtener socio por ID
+sociosRouter.get('/:id_socio', socioController.getById);
+
+// Crear nuevo socio
+sociosRouter.post('/sociosCrear', socioController.crear);
+
+// Modificar socio existente
+sociosRouter.patch('/:id_socio', socioController.modificar);
+
+// Eliminar socio
+sociosRouter.delete('/:id_socio', socioController.eliminar);
+
