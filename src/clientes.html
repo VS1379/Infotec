@@ -36,38 +36,37 @@
             <button type="submit">Buscar</button>
         </form>
 
-        <div id="response"></div> <!-- Aquí se mostrarán los resultados -->
+        <div id="response"></div>
 
         <h2>Agregar Cliente</h2>
         <form id="createClienteForm">
-            <label>DNI: <input type="number" id="dni" required min="11111111" max="99999999"></label>
-            <label>CUIT: <input type="number" id="cuit" required min="11111111111" max="99999999999"></label>
-            <label>Nombre: <input type="text" id="nombre" required></label>
-            <label>Dirección: <input type="text" id="direccion" required></label>
-            <label>Teléfono: <input type="number" id="telefono" required min="1111111111" max="999999999999"></label>
+            <label>DNI: <input type="text" id="dni" required pattern="\d{8}" title="Debe tener 8 dígitos numéricos"></label>
+            <label>CUIT: <input type="text" id="cuit" required pattern="\d{11}" title="Debe tener 11 dígitos numéricos"></label>
+            <label>Nombre: <input type="text" id="nombre" required maxlength="40" pattern="[A-Za-z0-9\s]{1,40}" title="Máximo 40 caracteres alfanuméricos"></label>
+            <label>Dirección: <input type="text" id="direccion" required maxlength="50" pattern="[A-Za-z0-9\s]{1,50}" title="Máximo 50 caracteres alfanuméricos"></label>
+            <label>Teléfono: <input type="text" id="telefono" required pattern="^[0-9\-]{1,20}$" maxlength="20" title="Solo números y guiones, máximo 20 caracteres"></label>
             <label>Correo: <input type="email" id="correo" required></label>
             <button type="submit">Agregar Cliente</button>
         </form>
         <h2>Actualizar Cliente</h2>
         <form id="updateClienteFormById">
-            <label>DNI: <input type="number" id="updateDni" required min="11111111" max="99999999"></label>
+            <label>DNI: <input type="text" id="updateDni" required pattern="\d{8}" title="Debe tener 8 dígitos numéricos"></label>
             <button type="submit">BUSCAR </button>
             <button type="reset"><a href="clientes.html"
                     style="text-decoration: none; color: white;">CANCELAR</a></button>
             <div id="dontExist"></div>
         </form>
         <form id="updateClienteForm" hidden>
-            <label>CUIT: <input type="number" id="updateCuit" required min="11111111111" max="99999999999"></label>
-            <label>Nombre: <input type="text" id="updateNombre" required></label>
-            <label>Dirección: <input type="text" id="updateDireccion" required></label>
-            <label>Teléfono: <input type="number" id="updateTelefono" required min="1111111111"
-                    max="999999999999"></label>
+            <label>CUIT: <input type="text" id="updateCuit" required pattern="\d{11}" title="Debe tener 11 dígitos numéricos"></label>
+            <label>Nombre: <input type="text" id="updateNombre" required maxlength="40" pattern="[A-Za-z0-9\s]{1,40}" title="Máximo 40 caracteres alfanuméricos"></label>
+            <label>Dirección: <input type="text" id="updateDireccion" required maxlength="50" pattern="[A-Za-z0-9\s]{1,50}" title="Máximo 50 caracteres alfanuméricos"></label>
+            <label>Teléfono: <input type="text" id="updateTelefono" required pattern="^[0-9\-]{1,20}$" maxlength="20" title="Solo números y guiones, máximo 20 caracteres"></label>
             <label>Correo: <input type="email" id="updateCorreo" required></label>
             <button type="submit">Actualizar Cliente</button>
         </form>
         <h2>Eliminar Cliente</h2>
         <form id="deleteClienteForm">
-            <label>DNI: <input type="number" id="deleteId" required min="11111111" max="99999999"></label>
+            <label>DNI: <input type="text" id="deleteId" required pattern="\d{8}" title="Debe tener 8 dígitos numéricos"></label>
             <button type="submit">Eliminar Cliente</button>
         </form>
         <div id="response"></div>

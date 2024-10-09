@@ -14,6 +14,8 @@ export class clienteController {
     try {
       const { dni } = req.params;
       const cliente = await clienteModel.getById(dni);
+      console.log(cliente);
+      
       if (cliente) return res.json(cliente);
       res.status(404).json({ message: "Cliente no encontrado" });
     } catch (error) {

@@ -16,31 +16,39 @@ export class socioModel {
         return rows;
     }
 
-    static async getById(id_socio) {
-        const [rows] = await connection.query('SELECT * FROM socios WHERE id_socio = ?', [id_socio]);
+    static async getById(dni) {
+        const [rows] = await connection.query('SELECT * FROM socios WHERE DNI = ?', [dni]);
+        console.log(rows);
+        
+        return rows[0];
+    }
+
+    static async getByField(field, data) {
+        const query = `SELECT * FROM socios WHERE ?? LIKE ?`;
+        const [rows] = await connection.query(query, [field, `%${data}%`]);
         return rows;
     }
 
     static async crear(socio) {
-        const { id_socio, dni, apellido_nombre, direccion, telefono, correo, socio_gerente } = socio;
+        const {dni, apellido_nombre, direccion, telefono, correo, socio_gerente } = socio;
         const [result] = await connection.query(
-            'INSERT INTO socios (id_socio, dni, apellido_nombre, direccion, telefono, correo, socio_gerente) VALUES (?, ?, ?, ?, ?, ?, ?)',
-            [id_socio, dni, apellido_nombre, direccion, telefono, correo, socio_gerente]
+            'INSERT INTO socios (dni, apellido_nombre, direccion, telefono, correo, socio_gerente) VALUES (?, ?, ?, ?, ?, ?)',
+            [dni, apellido_nombre, direccion, telefono, correo, socio_gerente]
         );
         return result;
     }
 
-    static async modificar(id_socio, socio) {
-        const { dni, apellido_nombre, direccion, telefono, correo, socio_gerente } = socio;
+    static async modificar(dni, socio) {
+        const {apellido_nombre, direccion, telefono, correo, socio_gerente } = socio;
         const [result] = await connection.query(
-            'UPDATE socios SET dni = ?, apellido_nombre = ?, direccion = ?, telefono = ?, correo = ?, socio_gerente = ? WHERE id_socio = ?',
-            [dni, apellido_nombre, direccion, telefono, correo, socio_gerente, id_socio]
+            'UPDATE socios SET apellido_nombre = ?, direccion = ?, telefono = ?, correo = ?, socio_gerente = ? WHERE DNI = ?',
+            [apellido_nombre, direccion, telefono, correo, socio_gerente, dni]
         );
         return result;
     }
 
-    static async eliminar(id_socio) {
-        const [result] = await connection.query('DELETE FROM socios WHERE id_socio = ?', [id_socio]);
+    static async eliminar(dni) {
+        const [result] = await connection.query('DELETE FROM socios WHERE DNI = ?', [dni]);
         return result.affectedRows > 0;
     }
 }

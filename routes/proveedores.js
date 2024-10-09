@@ -6,13 +6,16 @@ export const proveedoresRouter = Router();
 proveedoresRouter.get('/', proveedorController.getAll);
 
 // Obtener proveedor por ID
-proveedoresRouter.get('/:id_proveedor', proveedorController.getById);
+proveedoresRouter.get('/:cuit', proveedorController.getById);
+
+// Obtener un cliente por campo
+proveedoresRouter.get('/buscar/campo', proveedorController.getByField);
 
 // Crear nuevo proveedor
 proveedoresRouter.post('/proveedoresCrear', proveedorController.crear);
 
 // Modificar proveedor existente
-proveedoresRouter.patch('/:id_proveedor', proveedorController.modificar);
+proveedoresRouter.patch('/:cuit', proveedorController.modificar);
 
 // Eliminar proveedor
-proveedoresRouter.delete('/:id_proveedor', proveedorController.eliminar);
+proveedoresRouter.delete('/:cuit', proveedorController.eliminar);

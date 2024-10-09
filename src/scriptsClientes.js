@@ -126,7 +126,7 @@ document
       .catch((err) => console.error("Error:", err));
   });
 
-// Función para actualizar un cliente
+// Función para buscar el cliente a modificar
 document
   .getElementById("updateClienteFormById")
   .addEventListener("submit", function (event) {

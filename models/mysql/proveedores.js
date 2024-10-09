@@ -16,31 +16,38 @@ export class proveedorModel {
         return rows;
     }
 
-    static async getById(id_proveedor) {
-        const [rows] = await connection.query('SELECT * FROM proveedores WHERE id_proveedor = ?', [id_proveedor]);
+    static async getById(cuit) {
+        const [rows] = await connection.query('SELECT * FROM proveedores WHERE CUIT = ?', [cuit]);
+        return rows[0];
+    }
+
+    static async getByField(field, data) {
+        const query = `SELECT * FROM proveedores WHERE ?? LIKE ?`;
+        const [rows] = await connection.query(query, [field, `%${data}%`]);
         return rows;
     }
 
     static async crear(proveedor) {
-        const { id_proveedor, cuit, nombre, direccion, telefono, correo } = proveedor;
-        const [result] = await connection.query(
-            'INSERT INTO proveedores (id_proveedor, cuit, nombre, direccion, telefono, correo) VALUES (?, ?, ?, ?, ?, ?)',
-            [id_proveedor, cuit, nombre, direccion, telefono, correo]
-        );
-        return result;
-    }
-
-    static async modificar(id_proveedor, proveedor) {
         const { cuit, nombre, direccion, telefono, correo } = proveedor;
         const [result] = await connection.query(
-            'UPDATE proveedores SET cuit = ?, nombre = ?, direccion = ?, telefono = ?, correo = ? WHERE id_proveedor = ?',
-            [cuit, nombre, direccion, telefono, correo, id_proveedor]
+            'INSERT INTO proveedores (cuit, nombre, direccion, telefono, correo) VALUES (?, ?, ?, ?, ?)',
+            [cuit, nombre, direccion, telefono, correo]
         );
         return result;
     }
 
-    static async eliminar(id_proveedor) {
-        const [result] = await connection.query('DELETE FROM proveedores WHERE id_proveedor = ?', [id_proveedor]);
+    static async modificar(cuit, proveedor) {
+        const { nombre, direccion, telefono, correo } = proveedor;
+        const [result] = await connection.query(
+            'UPDATE proveedores SET nombre = ?, direccion = ?, telefono = ?, correo = ? WHERE CUIT = ?',
+            [nombre, direccion, telefono, correo, cuit]
+        );
+        return result;
+    }
+
+    static async eliminar(cuit) {
+        const [result] = await connection.query('DELETE FROM proveedores WHERE CUIT = ?', [cuit]);
         return result.affectedRows > 0;
     }
 }
+

@@ -1,62 +1,161 @@
 <!DOCTYPE html>
 <html lang="es">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Socios</title>
-    <link rel="stylesheet" href="styles.css">
-</head>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
 
-<body>
+  <body>
     <header>
-        <h1>Socios</h1>
-        <a href="index.html">Volver al inicio</a>
+      <h1>Socios</h1>
+      <a href="index.html">Volver al inicio</a>
     </header>
     <section>
-        <h2>Consultar Socios</h2>
-        <form id="getAllSociosForm">
-            <button type="submit">Obtener Todos</button>
-        </form>
+      <h2>Consultar Socios</h2>
+      <form id="getAllSociosForm">
+        <button type="submit">Obtener Todos</button>
+      </form>
+      <h2>Consultar Socios Por Un Campo</h2>
+      <form id="getSociosByField">
+        <label for="field">Buscar por:</label>
+        <select id="field" name="field">
+          <option value="DNI">DNI</option>
+          <option value="APELLIDO_NOMBRE">Nombre</option>
+          <option value="DIRECCION">Dirección</option>
+          <option value="TELEFONO">Teléfono</option>
+          <option value="CORREO">Correo</option>
+        </select>
 
-        <div id="response"></div> <!-- Aquí se mostrarán los resultados -->
+        <label for="data">Valor:</label>
+        <input type="text" id="data" name="data" required />
 
-        <h2>Agregar Socio</h2>
-        <form id="createSocioForm">
-            <!-- faltan validaciones de datos -->
-            <label>DNI: <input type="number" id="dni" required min="11111111" max="99999999"></label>
-            <label>Apellido y Nombre: <input type="text" id="apellido_nombre" required></label>
-            <label>Dirección: <input type="text" id="direccion" required></label>
-            <label>Teléfono: <input type="text" id="telefono" required></label>
-            <label>Correo: <input type="email" id="correo" required></label>
-            <label>Socio Gerente: <input type="checkbox" id="socio_gerente"></label>
-            <button type="submit">Agregar Socio</button>
-        </form>
-        <h2>Actualizar Socio</h2>
-        <form id="updateSocioFormById">
-            <label>ID: <input type="number" id="updateId" required min="1" max="9999"></label>
-            <button type="submit">BUSCAR </button>
-            <button type="reset"><a href="socios.html"
-                    style="text-decoration: none; color: white;">CANCELAR</a></button>
-            <div id="dontExist"></div>
-        </form>
-        <form id="updateSocioForm" hidden>
-            <label>DNI: <input type="number" id="updateDni" required min="11111111" max="99999999"></label>
-            <label>Apellido y Nombre: <input type="text" id="updateApellidoNombre" required></label>
-            <label>Dirección: <input type="text" id="updateDireccion" required></label>
-            <label>Teléfono: <input type="text" id="updateTelefono" required></label>
-            <label>Correo: <input type="email" id="updateCorreo" required></label>
-            <label>Socio Gerente: <input type="checkbox" id="updateSocioGerente"></label>
-            <button type="submit">Actualizar Socio</button>
-        </form>
-        <h2>Eliminar Socio</h2>
-        <form id="deleteSocioForm">
-            <label>ID: <input type="number" id="deleteId" required min="1" max="9999"></label>
-            <button type="submit">Eliminar Socio</button>
-        </form>
-        <div id="response"></div>
+        <button type="submit">Buscar</button>
+      </form>
+      <div id="response"></div>
+
+      <h2>Agregar Socio</h2>
+      <form id="createSocioForm">
+        <label
+          >DNI:
+          <input
+            type="text"
+            id="dni"
+            required
+            pattern="\d{8}"
+            title="Debe tener 8 dígitos solo numéricos"
+        /></label>
+        <label
+          >Apellido y Nombre:
+          <input
+            type="text"
+            id="apellido_nombre"
+            required
+            maxlength="40"
+            pattern="[A-Za-z0-9\s]{1,40}"
+            title="Máximo 40 caracteres alfanuméricos"
+        /></label>
+        <label
+          >Dirección:
+          <input
+            type="text"
+            id="direccion"
+            required
+            maxlength="50"
+            pattern="[A-Za-z0-9\s]{1,50}"
+            title="Máximo 50 caracteres alfanuméricos"
+        /></label>
+        <label
+          >Teléfono:
+          <input
+            type="text"
+            id="telefono"
+            required
+            pattern="^[0-9\-]{1,20}$"
+            maxlength="20"
+            title="Solo números y guiones, máximo 20 caracteres"
+          />
+        </label>
+        <label>Correo: <input type="email" id="correo" required /></label>
+        <label
+          >Socio Gerente: <input type="checkbox" id="socio_gerente"
+        /></label>
+        <button type="submit">Agregar Socio</button>
+      </form>
+
+      <h2>Actualizar Socio</h2>
+      <form id="updateSocioFormById">
+        <label
+          >DNI:
+          <input
+            type="text"
+            id="dni"
+            required
+            pattern="\d{8}"
+            title="Debe tener 8 dígitos solo numéricos"
+        /></label>
+        <button type="submit">BUSCAR</button>
+        <button type="reset">
+          <a href="socios.html" style="text-decoration: none; color: white"
+            >CANCELAR</a
+          >
+        </button>
+        <div id="dontExist"></div>
+      </form>
+      <form id="updateSocioForm" hidden>
+        <label
+          >Nombre:
+          <input
+            type="text"
+            id="updateNombre"
+            required
+            maxlength="40"
+            pattern="[A-Za-z0-9\s]{1,40}"
+            title="Máximo 40 caracteres alfanuméricos"
+        /></label>
+        <label
+          >Dirección:
+          <input
+            type="text"
+            id="updateDireccion"
+            required
+            maxlength="50"
+            pattern="[A-Za-z0-9\s]{1,50}"
+            title="Máximo 50 caracteres alfanuméricos"
+        /></label>
+        <label
+          >Teléfono:
+          <input
+            type="text"
+            id="updateTelefono"
+            required
+            maxlength="20"
+            pattern="^[0-9\-]{1,20}$"
+            title="Solo números y guiones, máximo 20 caracteres"
+        /></label>
+        <label>Correo: <input type="email" id="updateCorreo" required /></label>
+        <label
+          >Socio Gerente: <input type="checkbox" id="updateSocioGerente"
+        /></label>
+        <button type="submit">Actualizar Cliente</button>
+      </form>
+
+      <h2>Eliminar Socio</h2>
+      <form id="deleteSocioForm">
+        <label
+          >DNI:
+          <input
+            type="text"
+            id="dni"
+            required
+            pattern="\d{8}"
+            title="Debe tener 8 dígitos solo numéricos"
+          /></label>
+        <button type="submit">Eliminar Cliente</button>
+      </form>
+      <div id="response"></div>
     </section>
     <script src="scriptsSocios.js"></script>
-</body>
-
+  </body>
 </html>

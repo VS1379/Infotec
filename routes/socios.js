@@ -5,15 +5,18 @@ export const sociosRouter = Router();
 // Obtener todos los socios
 sociosRouter.get('/', socioController.getAll);
 
-// Obtener socio por ID
-sociosRouter.get('/:id_socio', socioController.getById);
+// Obtener socio por DNI
+sociosRouter.get('/:dni', socioController.getById);
+
+// Obtener un cliente por campo
+sociosRouter.get('/buscar/campo', socioController.getByField);
 
 // Crear nuevo socio
 sociosRouter.post('/sociosCrear', socioController.crear);
 
 // Modificar socio existente
-sociosRouter.patch('/:id_socio', socioController.modificar);
+sociosRouter.patch('/:dni', socioController.modificar);
 
 // Eliminar socio
-sociosRouter.delete('/:id_socio', socioController.eliminar);
+sociosRouter.delete('/:dni', socioController.eliminar);
 
