@@ -1,10 +1,10 @@
-import { tipoHardModel } from '../models/mysql/tipoHard.js';
+import { tipoHardwareModel } from '../models/mysql/tipoHardware.js';
 
-export class tipoHardController {
+export class tipoHardwareController {
     static async getAll(req, res) {
         try {
-            const tiposHard = await tipoHardModel.getAll();
-            res.json(tiposHard);
+            const tipos = await tipoHardwareModel.getAll();
+            res.json(tipos);
         } catch (error) {
             res.status(500).json({ message: 'Error al obtener los tipos de hardware' });
         }
@@ -12,9 +12,9 @@ export class tipoHardController {
 
     static async getById(req, res) {
         try {
-            const { id } = req.params;
-            const tipoHard = await tipoHardModel.getById(id);
-            if (tipoHard) return res.json(tipoHard);
+            const { id_tipohard } = req.params;
+            const tipo = await tipoHardwareModel.getById(id_tipohard);
+            if (tipo.length > 0) return res.json(tipo);
             res.status(404).json({ message: 'Tipo de hardware no encontrado' });
         } catch (error) {
             res.status(500).json({ message: 'Error al obtener el tipo de hardware' });
@@ -23,8 +23,8 @@ export class tipoHardController {
 
     static async crear(req, res) {
         try {
-            const tipoHard = req.body;
-            const result = await tipoHardModel.crear(tipoHard);
+            const tipo = req.body;
+            const result = await tipoHardwareModel.crear(tipo);
             res.status(201).json(result);
         } catch (error) {
             res.status(500).json({ message: 'Error al crear el tipo de hardware' });
@@ -33,9 +33,9 @@ export class tipoHardController {
 
     static async modificar(req, res) {
         try {
-            const { id } = req.params;
-            const tipoHard = req.body;
-            const result = await tipoHardModel.modificar(id, tipoHard);
+            const { id_tipohard } = req.params;
+            const tipo = req.body;
+            const result = await tipoHardwareModel.modificar(id_tipohard, tipo);
             if (result.affectedRows > 0) return res.json(result);
             res.status(404).json({ message: 'Tipo de hardware no encontrado' });
         } catch (error) {
@@ -45,12 +45,23 @@ export class tipoHardController {
 
     static async eliminar(req, res) {
         try {
-            const { id } = req.params;
-            const result = await tipoHardModel.eliminar(id);
+            const { id_tipohard } = req.params;
+            const result = await tipoHardwareModel.eliminar(id_tipohard);
             if (result) return res.status(204).end();
             res.status(404).json({ message: 'Tipo de hardware no encontrado' });
         } catch (error) {
             res.status(500).json({ message: 'Error al eliminar el tipo de hardware' });
+        }
+    }
+
+    static async buscarPorCampo(req, res) {
+        try {
+            const { campo, valor } = req.params;
+            const tipos = await tipoHardwareModel.buscarPorCampo(campo, valor);
+            if (tipos.length > 0) return res.json(tipos);
+            res.status(404).json({ message: 'Tipo de hardware no encontrado' });
+        } catch (error) {
+            res.status(500).json({ message: 'Error al buscar el tipo de hardware' });
         }
     }
 }

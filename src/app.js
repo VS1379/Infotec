@@ -1,10 +1,12 @@
-import express, { json } from 'express';
-import { clientesRouter } from '../routes/clientes.js';
-import { sociosRouter } from '../routes/socios.js';
-import { proveedoresRouter } from '../routes/proveedores.js';
-import { hardwareRouter } from '../routes/hardware.js';
+import express, { json } from "express";
+import { clientesRouter } from "../routes/clientes.js";
+import { sociosRouter } from "../routes/socios.js";
+import { proveedoresRouter } from "../routes/proveedores.js";
+import { hardwareRouter } from "../routes/hardware.js";
+import { marcaRouter } from "../routes/marca.js";
+import { tipoHardwareRouter } from "../routes/tipoHarware.js";
 //import validate from '../schemas/clientes/clientes.js'
-import cors from 'cors'
+import cors from "cors";
 
 const app = express();
 
@@ -16,9 +18,11 @@ app.use("/clientes", clientesRouter);
 app.use("/socios", sociosRouter);
 app.use("/proveedores", proveedoresRouter);
 app.use("/hardware", hardwareRouter);
+app.use("/marca", marcaRouter);
+app.use("/tipohardware", tipoHardwareRouter);
 
 const PORT = process.env.PORT ?? 3001;
 
 app.listen(PORT, () => {
-    console.log(`Server running at http://localhost:${PORT}`);
+  console.log(`Server running at http://localhost:${PORT}`);
 });

@@ -16,31 +16,39 @@ export class marcaModel {
         return rows;
     }
 
-    static async getById(id) {
-        const [rows] = await connection.query('SELECT * FROM marca WHERE idMarca = ?', [id]);
-        return rows[0];
+    static async getById(id_marca) {
+        const [rows] = await connection.query('SELECT * FROM marca WHERE id_marca = ?', [id_marca]);
+        return rows;
     }
 
     static async crear(marca) {
-        const { idMarca, descripcion } = marca;
+        const { id_marca, descripcion } = marca;
         const [result] = await connection.query(
-            'INSERT INTO marca (idMarca, descripcion) VALUES (?, ?)',
-            [idMarca, descripcion]
+            'INSERT INTO marca (id_marca, descripcion) VALUES (?, ?)',
+            [id_marca, descripcion]
         );
         return result;
     }
 
-    static async modificar(id, marca) {
+    static async modificar(id_marca, marca) {
         const { descripcion } = marca;
         const [result] = await connection.query(
-            'UPDATE marca SET descripcion = ? WHERE idMarca = ?',
-            [descripcion, id]
+            'UPDATE marca SET descripcion = ? WHERE id_marca = ?',
+            [descripcion, id_marca]
         );
         return result;
     }
 
-    static async eliminar(id) {
-        const [result] = await connection.query('DELETE FROM marca WHERE idMarca = ?', [id]);
+    static async eliminar(id_marca) {
+        const [result] = await connection.query('DELETE FROM marca WHERE id_marca = ?', [id_marca]);
         return result.affectedRows > 0;
+    }
+
+    static async buscarPorCampo(campo, valor) {
+        const [rows] = await connection.query(
+            `SELECT * FROM marca WHERE ${campo} = ?`,
+            [valor]
+        );
+        return rows;
     }
 }
