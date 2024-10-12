@@ -119,29 +119,35 @@ document.addEventListener("DOMContentLoaded", () => {
   ]);
 
   // Función para buscar un registro por campo
-  function fetchByField(url, formId, responseDivId) {
+  function fetchByField(url, formId, responseDivId, fieldParam, dataParam) {
     document
       .getElementById(formId)
       .addEventListener("submit", function (event) {
         event.preventDefault();
-        const field = document.getElementById("field").value;
-        const data = document.getElementById("data").value;
-        fetch(`${url}?${field}=${data}`)
+        const field = document.getElementById(fieldParam).value;
+        const data = document.getElementById(dataParam).value;
+        fetch(`${url}/buscar/${field}/${data}`)
           .then((response) => response.json())
           .then((data) => {
-            const responseDiv = document.getElementById(responseDivId);
-            const html = data
-              .map(
-                (item) => `
+            if (Array.isArray(data) && data.length > 0) {
+              const responseDiv = document.getElementById(responseDivId);
+              const html = data
+                .map(
+                  (item) => `
                 <div style="border: 1px solid #ccc; padding: 10px; margin: 5px;">
-                  ${Object.entries(item)
-                    .map(([key, value]) => `<p>${key}: ${value}</p>`)
-                    .join("")}
-                </div>
-              `
-              )
-              .join("");
-            responseDiv.innerHTML = html;
+                ${Object.entries(item)
+                  .map(([key, value]) => `<p>${key}: ${value}</p>`)
+                  .join("")}
+                  </div>
+                  `
+                )
+                .join("");
+              responseDiv.innerHTML = html;
+            } else {
+              document.getElementById(
+                responseDivId
+              ).innerHTML = `<div>No se encontraron resultados.</div>`;
+            }
           })
           .catch((err) => console.error("Error:", err));
       });
@@ -151,17 +157,19 @@ document.addEventListener("DOMContentLoaded", () => {
   fetchByField(
     "http://localhost:3001/hardware",
     "getHardwareByField",
-    "hardwareResponse"
+    "hardwareResponse", "fieldHardware", "dataHardware"
   );
   fetchByField(
     "http://localhost:3001/tipohardware",
     "getTipoHardwareByField",
-    "tipoHardwareResponse"
+    "tipoHardwareResponse",
+    "fieldTipoHardware",
+    "dataTipoHardware"
   );
   fetchByField(
     "http://localhost:3001/marca",
     "getMarcaByField",
-    "marcaResponse"
+    "marcaResponse", "fieldMarca", "dataMarca"
   );
 
   // Función para buscar un registro por ID y mostrar el formulario de actualización

@@ -79,8 +79,8 @@ export class hardwareModel {
 
   static async buscarPorCampo(campo, valor) {
     const [rows] = await connection.query(
-      `SELECT * FROM hardware WHERE ${campo} = ?`,
-      [valor]
+      `SELECT * FROM hardware WHERE ${campo} LIKE ?`,
+      `%${valor}%`
     );
     return rows;
   }

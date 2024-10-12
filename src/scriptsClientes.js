@@ -71,7 +71,6 @@ document
         }
       })
       .then((data) => {
-        console.log(data);
         if (Array.isArray(data) && data.length > 0) {
 
           const responseDiv = document.getElementById("response");

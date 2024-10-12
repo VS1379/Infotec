@@ -54,7 +54,7 @@ export class tipoHardwareController {
         }
     }
 
-    static async buscarPorCampo(req, res) {
+    static async buscarPorCampo(req, res) {        
         try {
             const { campo, valor } = req.params;
             const tipos = await tipoHardwareModel.buscarPorCampo(campo, valor);

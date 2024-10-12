@@ -46,8 +46,8 @@ export class marcaModel {
 
     static async buscarPorCampo(campo, valor) {
         const [rows] = await connection.query(
-            `SELECT * FROM marca WHERE ${campo} = ?`,
-            [valor]
+            `SELECT * FROM marca WHERE ${campo} LIKE ?`,
+            `%${valor}%`
         );
         return rows;
     }

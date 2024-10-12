@@ -31,12 +31,12 @@
         <h3>Consultar Marca Por Un Campo</h3>
         <form id="getMarcaByField">
             <label for="field">Buscar por:</label>
-            <select id="field" name="field">
+            <select id="fieldMarca" name="field">
                 <option value="ID_Marca">ID</option>
                 <option value="DESCRIPCION">Descripción</option>
             </select>
             <label for="data">Valor:</label>
-            <input type="text" id="data" name="data" required />
+            <input type="text" id="dataMarca" name="data" required />
             <button type="submit">Buscar</button>
         </form>
         <div id="marcaResponse"></div>
@@ -74,12 +74,12 @@
         <h3>Consultar Tipo de Hardware Por Un Campo</h3>
         <form id="getTipoHardwareByField">
             <label for="field">Buscar por:</label>
-            <select id="field" name="field">
+            <select id="fieldTipoHardware" name="field">
                 <option value="ID_Tipohard">ID</option>
                 <option value="DESCRIPCION">Descripción</option>
             </select>
             <label for="data">Valor:</label>
-            <input type="text" id="data" name="data" required />
+            <input type="text" id="dataTipoHardware" name="data" required />
             <button type="submit">Buscar</button>
         </form>
         <div id="tipoHardwareResponse"></div>
@@ -117,7 +117,7 @@
         <h3>Consultar Hardware Por Un Campo</h3>
         <form id="getHardwareByField">
             <label for="field">Buscar por:</label>
-            <select id="field" name="field">
+            <select id="fieldHardware" name="field">
                 <option value="ID_Hard">ID</option>
                 <option value="ID_Tipohard">Tipo</option>
                 <option value="ID_Marca">Marca</option>
@@ -126,7 +126,7 @@
                 <option value="UNIDADES_DISPONIBLES">Unidades Disponibles</option>
             </select>
             <label for="data">Valor:</label>
-            <input type="text" id="data" name="data" required />
+            <input type="text" id="dataHardware" name="data" required />
             <button type="submit">Buscar</button>
         </form>
         <div id="hardwareResponse"></div>
