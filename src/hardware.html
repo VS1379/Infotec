@@ -42,19 +42,18 @@
         <div id="marcaResponse"></div>
         <h3>Agregar Marca</h3>
         <form id="createMarcaForm">
-            <label>ID: <input type="number" id="id_marca" required min="1" max="99"></label>
-            <label>Nombre de la marca: <input type="text" id="nombreMarca" required></label>
+            <label>Nombre de la marca: <input type="text" id="nombreMarca" required maxlength="25" pattern="[A-Za-z0-9\s]{1,25}" title="Máximo 25 caracteres alfanuméricos"></label>
             <button type="submit">Agregar Marca</button>
         </form>
         <h3>Actualizar Marca</h3>
         <form id="updateMarcaFormById">
-            <label>ID: <input type="number" id="updateId" required min="1" max="99"></label>
+            <label>ID: <input type="number" id="updateIdMarca" required min="1" max="99"></label>
             <button type="submit">BUSCAR</button>
             <button type="reset"><a href="hardware.html" style="text-decoration: none; color: white;">CANCELAR</a></button>
             <div id="dontExist"></div>
         </form>
         <form id="updateMarcaForm" hidden>
-            <label>Nombre de la marca: <input type="text" id="updateNombreMarca" required></label>
+            <label>Nombre de la marca: <input type="text" id="updateNombreMarca" required maxlength="25" pattern="[A-Za-z0-9\s]{1,25}" title="Máximo 25 caracteres alfanuméricos"></label>
             <button type="submit">Actualizar Marca</button>
         </form>
         <h3>Eliminar Marca</h3>
@@ -85,13 +84,12 @@
         <div id="tipoHardwareResponse"></div>
         <h3>Agregar Tipo de Hardware</h3>
         <form id="createTipoHardwareForm">
-            <label>ID: <input type="number" id="id_tipohard" required min="1" max="99"></label>
-            <label>Tipo del Hardware: <input type="text" id="descripcionTipoHardware" required></label>
+            <label>Tipo del Hardware: <input type="text" id="descripcionTipoHardware" required maxlength="40" pattern="[A-Za-z0-9\s]{1,40}" title="Máximo 40 caracteres alfanuméricos"></label>
             <button type="submit">Agregar Tipo de Hardware</button>
         </form>
         <h3>Actualizar Tipo de Hardware</h3>
         <form id="updateTipoHardFormById">
-            <label>ID: <input type="number" id="updateId" required min="1" max="99"></label>
+            <label>ID: <input type="number" id="updateIdTipoHardware" required min="1" max="99"></label>
             <button type="submit">BUSCAR</button>
             <button type="reset"><a href="hardware.html" style="text-decoration: none; color: white;">CANCELAR</a></button>
             <div id="dontExist"></div>
@@ -142,7 +140,7 @@
         </form>
         <h3>Actualizar Hardware</h3>
         <form id="updateHardwareFormById">
-            <label>ID: <input type="number" id="updateId" required min="1" max="9999"></label>
+            <label>ID: <input type="number" id="updateIdHardware" required min="1" max="9999"></label>
             <button type="submit">BUSCAR</button>
             <button type="reset"><a href="hardware.html" style="text-decoration: none; color: white;">CANCELAR</a></button>
             <div id="dontExist"></div>

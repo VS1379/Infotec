@@ -92,25 +92,23 @@ document.addEventListener("DOMContentLoaded", () => {
           body: JSON.stringify(record),
         })
           .then((response) => {
-            if (handleResponse(response, formId + "Response")) {
-              alert("Agregado correctamente");
-            }
+            alert("Agregado correctamente");
+            document.getElementById(formId).reset();
           })
           .catch((err) => console.error("Error:", err));
       });
   }
 
   // Agregar registros
-  createRecord("http://localhost:3001/tipohardware", "createTipoHardwareForm", [
-    "id_tipohard",
-    "descripcionTipoHardware",
-  ]);
-  createRecord("http://localhost:3001/marca", "createMarcaForm", [
-    "id_marca",
+  createRecord(
+    "http://localhost:3001/tipohardware/tipoHardwareCrear",
+    "createTipoHardwareForm",
+    ["descripcionTipoHardware"]
+  );
+  createRecord("http://localhost:3001/marca/marcaCrear", "createMarcaForm", [
     "nombreMarca",
   ]);
   createRecord("http://localhost:3001/hardware", "createHardwareForm", [
-    "id_hard",
     "id_tipohard",
     "id_marca",
     "caracteristicas",
@@ -157,7 +155,9 @@ document.addEventListener("DOMContentLoaded", () => {
   fetchByField(
     "http://localhost:3001/hardware",
     "getHardwareByField",
-    "hardwareResponse", "fieldHardware", "dataHardware"
+    "hardwareResponse",
+    "fieldHardware",
+    "dataHardware"
   );
   fetchByField(
     "http://localhost:3001/tipohardware",
@@ -169,33 +169,10 @@ document.addEventListener("DOMContentLoaded", () => {
   fetchByField(
     "http://localhost:3001/marca",
     "getMarcaByField",
-    "marcaResponse", "fieldMarca", "dataMarca"
+    "marcaResponse",
+    "fieldMarca",
+    "dataMarca"
   );
-
-  // Función para buscar un registro por ID y mostrar el formulario de actualización
-  function fetchById(url, formId, updateFormId, fields) {
-    document
-      .getElementById(formId)
-      .addEventListener("submit", function (event) {
-        event.preventDefault();
-        const id = document.getElementById("updateId").value;
-        fetch(`${url}/${id}`)
-          .then((response) => response.json())
-          .then((data) => {
-            if (data) {
-              document.getElementById("dontExist").innerHTML = "";
-              document.getElementById(updateFormId).hidden = false;
-              fields.forEach((field) => {
-                document.getElementById(field).value = data[field] || "";
-              });
-            } else {
-              document.getElementById("dontExist").innerHTML =
-                "<br>El registro no existe</br>";
-            }
-          })
-          .catch((err) => console.error("Error:", err));
-      });
-  }
 
   // Buscar registros por ID
   fetchById(
@@ -223,16 +200,73 @@ document.addEventListener("DOMContentLoaded", () => {
     ["updateNombreMarca"]
   );
 
+  // Función para buscar un registro por ID y mostrar el formulario de actualización
+  function fetchById(url, formId, updateFormId, updateId, fields) {
+    document
+      .getElementById(formId)
+      .addEventListener("submit", function (event) {
+        event.preventDefault();
+        const id = document.getElementById(updateId).value;
+        fetch(`${url}/${id}`)
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error("Registro no encontrado");
+            }
+            return response.json();
+          })
+          .then((data) => {
+            document.getElementById("dontExist").innerHTML = "";
+            const updateForm = document.getElementById(updateFormId);
+            if (updateForm) {
+              updateForm.hidden = false; // Mostrar el formulario de actualización
+            }
+            const updateIdField = document.getElementById(updateId);
+            if (updateIdField) {
+              updateIdField.readOnly = true; // Bloquear el campo de ID
+            }
+            fields.forEach((field) => {
+              const element = document.getElementById(field);
+              if (element) {
+                element.value = data[field] || "";
+              }
+            });
+          })
+          .catch((err) => {
+            document.getElementById("dontExist").innerHTML =
+              "<br>El registro no existe</br>";
+            const updateForm = document.getElementById(updateFormId);
+            if (updateForm) {
+              updateForm.hidden = true; // Ocultar el formulario si no se encuentra el registro
+            }
+            const updateIdField = document.getElementById(updateId);
+            if (updateIdField) {
+              updateIdField.readOnly = false; // Desbloquear el campo de ID
+            }
+          });
+      });
+  }
+
   // Función para actualizar un registro
-  function updateRecord(url, formId, fields) {
+  function updateRecord(url, formId, fields, updateId, updateFormId) {
     document
       .getElementById(formId)
       .addEventListener("submit", function (event) {
         event.preventDefault();
         const record = {};
-        const id = document.getElementById("updateId").value;
+        const idElement = document.getElementById(updateId);
+        if (!idElement) {
+          console.error("El campo ID no existe.");
+          return;
+        }
+        const id = idElement.value;
         fields.forEach((field) => {
-          record[field] = document.getElementById(field).value;
+          const element = document.getElementById(field);
+          if (element) {
+            const value = element.value;
+            if (value) {
+              record[field] = value;
+            }
+          }
         });
         fetch(`${url}/${id}`, {
           method: "PATCH",
@@ -242,28 +276,76 @@ document.addEventListener("DOMContentLoaded", () => {
           body: JSON.stringify(record),
         })
           .then((response) => {
-            if (handleResponse(response, formId + "Response")) {
+            if (handleResponse(response, formId)) {
               alert("Actualizado correctamente");
+              location.reload()
+              idElement.readOnly = false;
+              const updateForm = document.getElementById(updateFormId);
+              if (updateForm) {
+                updateForm.reset(); // Restablecer los campos del formulario
+              }
             }
           })
           .catch((err) => console.error("Error:", err));
       });
   }
 
-  // Actualizar registros
-  updateRecord("http://localhost:3001/hardware", "updateHardwareForm", [
-    "updateTipohard",
-    "updateMarca",
-    "updateCaracteristicas",
-    "updatePrecioUnitario",
-    "updateUnidadesDisponibles",
-  ]);
-  updateRecord("http://localhost:3001/tipohardware", "updateTipoHardForm", [
-    "updateDescripcionTipoHardware",
-  ]);
-  updateRecord("http://localhost:3001/marca", "updateMarcaForm", [
-    "updateNombreMarca",
-  ]);
+  // Buscar y actualizar registros
+  fetchById(
+    "http://localhost:3001/hardware",
+    "updateHardwareFormById",
+    "updateHardwareForm",
+    "updateIdHardware",
+    [
+      "updateTipohard",
+      "updateMarca",
+      "updateCaracteristicas",
+      "updatePrecioUnitario",
+      "updateUnidadesDisponibles",
+    ]
+  );
+  fetchById(
+    "http://localhost:3001/tipohardware",
+    "updateTipoHardFormById",
+    "updateTipoHardForm",
+    "updateIdTipoHardware",
+    ["updateDescripcionTipoHardware"]
+  );
+  fetchById(
+    "http://localhost:3001/marca",
+    "updateMarcaFormById",
+    "updateMarcaForm",
+    "updateIdMarca",
+    ["updateNombreMarca"]
+  );
+
+  updateRecord(
+    "http://localhost:3001/hardware",
+    "updateHardwareForm",
+    [
+      "updateTipohard",
+      "updateMarca",
+      "updateCaracteristicas",
+      "updatePrecioUnitario",
+      "updateUnidadesDisponibles",
+    ],
+    "updateIdHardware",
+    "updateHardwareFormById"
+  );
+  updateRecord(
+    "http://localhost:3001/tipohardware",
+    "updateTipoHardForm",
+    ["updateDescripcionTipoHardware"],
+    "updateIdTipoHardware",
+    "updateTipoHardFormById"
+  );
+  updateRecord(
+    "http://localhost:3001/marca",
+    "updateMarcaForm",
+    ["updateNombreMarca"],
+    "updateIdMarca",
+    "updateMarcaFormById"
+  );
 
   // Función para eliminar un registro con verificación de dependencias
   function deleteRecord(url, formId) {
@@ -272,37 +354,23 @@ document.addEventListener("DOMContentLoaded", () => {
       .addEventListener("submit", function (event) {
         event.preventDefault();
         const id = document.getElementById("deleteId").value;
-        fetch(`${url}/${id}`)
-          .then((response) => response.json())
-          .then((data) => {
-            if (data.dependencias && data.dependencias.length > 0) {
-              const confirmDelete = confirm(
-                "Este registro tiene dependencias. ¿Desea eliminar todo?"
+        fetch(`${url}/${id}`, { method: "DELETE" })
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error(
+                `Error: ${response.status} - ${response.statusText}`
               );
-              if (confirmDelete) {
-                fetch(`${url}/${id}`, {
-                  method: "DELETE",
-                })
-                  .then((response) => {
-                    if (handleResponse(response, formId + "Response")) {
-                      alert("Eliminado correctamente");
-                    }
-                  })
-                  .catch((err) => console.error("Error:", err));
-              }
-            } else {
-              fetch(`${url}/${id}`, {
-                method: "DELETE",
-              })
-                .then((response) => {
-                  if (handleResponse(response, formId + "Response")) {
-                    alert("Eliminado correctamente");
-                  }
-                })
-                .catch((err) => console.error("Error:", err));
             }
+            return response.text(); // Cambiar a text() en lugar de json()
           })
-          .catch((err) => console.error("Error:", err));
+          .then(() => {
+            alert("Eliminado correctamente");
+            document.getElementById(formId).reset(); // Limpiar el formulario después de eliminar
+          })
+          .catch((err) => {
+            console.error("Error:", err);
+            alert(err.message); // Mostrar el mensaje de error en una alerta
+          });
       });
   }
 

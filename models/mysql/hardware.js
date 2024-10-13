@@ -26,7 +26,6 @@ export class hardwareModel {
 
   static async crear(hardware) {
     const {
-      id_hard,
       id_tipohard,
       id_marca,
       caracteristicas,
@@ -34,9 +33,8 @@ export class hardwareModel {
       unidades_disponibles,
     } = hardware;
     const [result] = await connection.query(
-      "INSERT INTO hardware (id_hard, id_tipohard, id_marca, caracteristicas, precio_unitario, unidades_disponibles) VALUES (?, ?, ?, ?, ?, ?)",
+      "INSERT INTO hardware (id_tipohard, id_marca, caracteristicas, precio_unitario, unidades_disponibles) VALUES (?, ?, ?, ?, ?, ?)",
       [
-        id_hard,
         id_tipohard,
         id_marca,
         caracteristicas,
