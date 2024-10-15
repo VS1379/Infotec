@@ -23,9 +23,15 @@ export class pedidoController {
 
   static async crear(req, res) {
     try {
-      const pedidoId = await pedidoModel.crear(req.body);
-      res.status(201).json({ message: "Pedido creado", pedidoId });
+      const { cliente, fechaPedido, tipoPedido } = req.body;
+      const nuevoPedido = await pedidoModel.crear({
+        cliente,
+        fechaPedido,
+        tipoPedido,
+      });
+      res.status(201).json({ IDPedido: nuevoPedido.IDPedido });
     } catch (error) {
+      console.error("Error al crear el pedido:", error);
       res.status(500).json({ message: "Error al crear el pedido" });
     }
   }

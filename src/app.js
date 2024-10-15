@@ -6,6 +6,7 @@ import { hardwareRouter } from "../routes/hardware.js";
 import { marcaRouter } from "../routes/marca.js";
 import { tipoHardwareRouter } from "../routes/tipoHarware.js";
 import { pedidosRouter } from "../routes/pedidos.js";
+import { detallePedidosRouter } from "../routes/detallePedidos.js";
 //import validate from '../schemas/clientes/clientes.js'
 import cors from "cors";
 
@@ -21,7 +22,8 @@ app.use("/proveedores", proveedoresRouter);
 app.use("/hardware", hardwareRouter);
 app.use("/marca", marcaRouter);
 app.use("/tipohardware", tipoHardwareRouter);
-app.use('/pedidos', pedidosRouter);
+app.use("/pedidos", pedidosRouter);
+app.use("/detallePedidos", detallePedidosRouter);
 
 const PORT = process.env.PORT ?? 3001;
 

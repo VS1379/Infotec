@@ -24,22 +24,31 @@ export class pedidoModel {
     return result[0];
   }
 
-  static async crear(pedido) {
-    const { cliente, fechaPedido, tipoPedido } = pedido;
-    const [result] = await connection.query(
-      "INSERT INTO pedidos (cliente, fechaPedido, tipoPedido) VALUES (?, ?, ?)",
-      [cliente, fechaPedido, tipoPedido]
-    );
-    return result.insertId;
-  }
+  // static async modificar(id_marca, marca) {
+  // const { updateNombreMarca: descripcion } = marca;
 
-  static async agregarDetalle(pedidoId, detalle) {
-    const { tipoHardware, marcaHardware, cantidad } = detalle;
-    const [result] = await connection.query(
-      "INSERT INTO detalles_pedido (pedido_id, tipoHardware, marcaHardware, cantidad) VALUES (?, ?, ?, ?)",
-      [pedidoId, tipoHardware, marcaHardware, cantidad]
-    );
-    return result;
+  static async crear(datos) {
+    const condicion = 1;
+    console.log(datos);
+    const { cliente: IDCliente } = datos;
+    const { fechaPedido: FechaHora } = datos;
+    const { tipoPedido: TipoPedido } = datos;
+
+    try {
+      const [result] = await connection.query(
+        "INSERT INTO pedidos (IDCliente, FechaHora, Condicion, TipoPedido) VALUES (?, ?, ?, ?)",
+        [IDCliente, FechaHora, condicion, TipoPedido]
+      );
+      const [lastIdResult] = await connection.query(
+        "SELECT LAST_INSERT_ID() AS IDPedido"
+      );
+      const IDPedido = lastIdResult[0].IDPedido;
+
+      return { result, IDPedido };
+    } catch (error) {
+      console.error("Error al crear el pedido:", error);
+      throw error;
+    }
   }
 
   static async eliminar(id) {

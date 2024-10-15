@@ -202,97 +202,73 @@ document.addEventListener("DOMContentLoaded", () => {
   );
   */
 
+  // Función para obtener la descripción de la marca
+  async function getMarcaDescripcion(idMarca) {
+    const response = await fetch(`http://localhost:3001/marca/${idMarca}`);
+    const data = await response.json();
+    return data[0]?.DESCRIPCION || "Descripción no encontrada";
+  }
+
+  // Función para obtener la descripción del tipo de hardware
+  async function getTipoHardwareDescripcion(idTipoHardware) {
+    const response = await fetch(
+      `http://localhost:3001/tipohardware/${idTipoHardware}`
+    );
+    const data = await response.json();
+    return data[0]?.DESCRIPCION || "Descripción no encontrada";
+  }
+
   // Función para buscar un registro por campo
   function fetchByField(url, formId, responseDivId, fieldParam, dataParam) {
     document
       .getElementById(formId)
-      .addEventListener("submit", function (event) {
+      .addEventListener("submit", async function (event) {
         event.preventDefault();
         const field = document.getElementById(fieldParam).value;
-        const data = document.getElementById(dataParam).value;
-        fetch(`${url}/buscar/${field}/${data}`)
-          .then((response) => response.json())
-          .then((data) => {
-            if (Array.isArray(data) && data.length > 0) {
-              const responseDiv = document.getElementById(responseDivId);
-              if (formId === "getHardwareByField") {
-                const promises = data.map((item) => {
-                  const tipoPromise = fetch(
-                    `http://localhost:3001/tipohardware/${item.ID_Tipohard}`
-                  )
-                    .then((res) => res.json())
-                    .then((tipoData) =>
-                      tipoData[0]
-                        ? tipoData[0].DESCRIPCION
-                        : "Descripción no disponible"
-                    );
-
-                  const marcaPromise = fetch(
-                    `http://localhost:3001/marca/${item.ID_Marca}`
-                  )
-                    .then((res) => res.json())
-                    .then((marcaData) =>
-                      marcaData[0]
-                        ? marcaData[0].DESCRIPCION
-                        : "Descripción no disponible"
-                    );
-
-                  // Retornar un objeto que contenga tanto el item original como las descripciones
-                  return Promise.all([tipoPromise, marcaPromise]).then(
-                    ([tipoDesc, marcaDesc]) => {
-                      return {
-                        ...item,
-                        tipoDescripcion: tipoDesc,
-                        marcaDescripcion: marcaDesc,
-                      };
-                    }
+        const dataValue = document.getElementById(dataParam).value;
+        try {
+          const response = await fetch(`${url}/buscar/${field}/${dataValue}`);
+          const result = await response.json();
+          if (Array.isArray(result) && result.length > 0) {
+            const responseDiv = document.getElementById(responseDivId);
+            const html = await Promise.all(
+              result.map(async (item) => {
+                if (formId === "getHardwareByField") {
+                  const marcaDescripcion = await getMarcaDescripcion(
+                    item.ID_Marca
                   );
-                });
-
-                return Promise.all(promises).then((enrichedData) => {
-                  // Crear el HTML para mostrar los resultados
-                  const html = enrichedData
-                    .map(
-                      (item) => `
-                  <div style="border: 1px solid #ccc; padding: 10px; margin: 5px;">
-                    ${Object.entries(item)
-                      .filter(
-                        ([key]) => !["ID_Tipohard", "ID_Marca"].includes(key)
-                      ) // Excluir IDs
-                      .map(([key, value]) => `<p>${key}: ${value}</p>`)
-                      .join("")}
-                    <p>Tipo: ${item.tipoDescripcion}</p>
-                    <p>Marca: ${item.marcaDescripcion}</p>
-                  </div>
-                  `
-                    )
-                    .join("");
-
-                  responseDiv.innerHTML = html; // Mostrar el HTML generado
-                });
-              } else {
-                // Para otros tipos de búsqueda, simplemente devolver los datos
-                const html = data
-                  .map(
-                    (item) => `
-                  <div style="border: 1px solid #ccc; padding: 10px; margin: 5px;">
-                    ${Object.entries(item)
-                      .map(([key, value]) => `<p>${key}: ${value}</p>`)
-                      .join("")}
-                  </div>
-                  `
-                  )
-                  .join("");
-
-                responseDiv.innerHTML = html; // Mostrar el HTML generado
-              }
-            } else {
-              document.getElementById(
-                responseDivId
-              ).innerHTML = `<div>No se encontraron resultados.</div>`;
-            }
-          })
-          .catch((err) => console.error("Error:", err));
+                  const tipoHardwareDescripcion =
+                    await getTipoHardwareDescripcion(item.ID_Tipohard);
+                  return `
+              <div style="border: 1px solid #ccc; padding: 10px; margin: 5px;">
+                <p>ID_Hard: ${item.ID_Hard}</p>
+                <p>Marca: ${marcaDescripcion}</p>
+                <p>Tipo de Hardware: ${tipoHardwareDescripcion}</p>
+                <p>Características: ${item.CARACTERISTICAS}</p>
+                <p>Precio Unitario: ${item.PRECIO_UNITARIO}</p>
+                <p>Unidades Disponibles: ${item.UNIDADES_DISPONIBLES}</p>
+              </div>
+            `;
+                } else {
+                  return `
+              <div style="border: 1px solid #ccc; padding: 10px; margin: 5px;">
+                ${Object.entries(item)
+                  .map(([key, value]) => `<p>${key}: ${value}</p>`)
+                  .join("")}
+              </div>
+            `;
+                }
+              })
+            );
+            responseDiv.innerHTML = html.join("");
+          } else {
+            document.getElementById(
+              responseDivId
+            ).innerHTML = `<div>No se encontraron resultados.</div>`;
+          }
+        } catch (err) {
+          console.error("Error:", err);
+        }
       });
   }
 
@@ -317,32 +293,6 @@ document.addEventListener("DOMContentLoaded", () => {
     "marcaResponse",
     "fieldMarca",
     "dataMarca"
-  );
-
-  // Buscar registros por ID
-  fetchById(
-    "http://localhost:3001/hardware",
-    "updateHardwareFormById",
-    "updateHardwareForm",
-    [
-      "updateTipohard",
-      "updateMarca",
-      "updateCaracteristicas",
-      "updatePrecioUnitario",
-      "updateUnidadesDisponibles",
-    ]
-  );
-  fetchById(
-    "http://localhost:3001/tipohardware",
-    "updateTipoHardFormById",
-    "updateTipoHardForm",
-    ["updateDescripcionTipoHardware"]
-  );
-  fetchById(
-    "http://localhost:3001/marca",
-    "updateMarcaFormById",
-    "updateMarcaForm",
-    ["updateNombreMarca"]
   );
 
   // Función para buscar un registro por ID y mostrar el formulario de actualización

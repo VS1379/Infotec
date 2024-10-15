@@ -14,7 +14,6 @@ export class clienteController {
     try {
       const { dni } = req.params;
       const cliente = await clienteModel.getById(dni);
-      console.log(cliente);
       
       if (cliente) return res.json(cliente);
       res.status(404).json({ message: "Cliente no encontrado" });
@@ -45,11 +44,6 @@ export class clienteController {
 
   static async crear(req, res) {
     try {
-      console.log("req.params");
-      console.log(req.params);
-      console.log("req.body");
-      console.log(req.body);
-
       const { dni, cuit, nombre, direccion, telefono, correo } = req.body;
       if (!dni || !cuit || !nombre || !direccion || !telefono || !correo) {
         return res
