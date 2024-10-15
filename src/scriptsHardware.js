@@ -116,7 +116,8 @@ document.addEventListener("DOMContentLoaded", () => {
     "unidades_disponibles",
   ]);
 
-  // Función para buscar un registro por campo
+  /*
+   // Función para buscar un registro por campo
   function fetchByField(url, formId, responseDivId, fieldParam, dataParam) {
     document
       .getElementById(formId)
@@ -141,6 +142,150 @@ document.addEventListener("DOMContentLoaded", () => {
                 )
                 .join("");
               responseDiv.innerHTML = html;
+            } else {
+              document.getElementById(
+                responseDivId
+              ).innerHTML = `<div>No se encontraron resultados.</div>`;
+            }
+          })
+          .catch((err) => console.error("Error:", err));
+      });
+  }
+
+  // Buscar registros por campo
+  fetchByField(
+    "http://localhost:3001/hardware",
+    "getHardwareByField",
+    "hardwareResponse",
+    "fieldHardware",
+    "dataHardware"
+  );
+  fetchByField(
+    "http://localhost:3001/tipohardware",
+    "getTipoHardwareByField",
+    "tipoHardwareResponse",
+    "fieldTipoHardware",
+    "dataTipoHardware"
+  );
+  fetchByField(
+    "http://localhost:3001/marca",
+    "getMarcaByField",
+    "marcaResponse",
+    "fieldMarca",
+    "dataMarca"
+  );
+
+  // Buscar registros por ID
+  fetchById(
+    "http://localhost:3001/hardware",
+    "updateHardwareFormById",
+    "updateHardwareForm",
+    [
+      "updateTipohard",
+      "updateMarca",
+      "updateCaracteristicas",
+      "updatePrecioUnitario",
+      "updateUnidadesDisponibles",
+    ]
+  );
+  fetchById(
+    "http://localhost:3001/tipohardware",
+    "updateTipoHardFormById",
+    "updateTipoHardForm",
+    ["updateDescripcionTipoHardware"]
+  );
+  fetchById(
+    "http://localhost:3001/marca",
+    "updateMarcaFormById",
+    "updateMarcaForm",
+    ["updateNombreMarca"]
+  );
+  */
+
+  // Función para buscar un registro por campo
+  function fetchByField(url, formId, responseDivId, fieldParam, dataParam) {
+    document
+      .getElementById(formId)
+      .addEventListener("submit", function (event) {
+        event.preventDefault();
+        const field = document.getElementById(fieldParam).value;
+        const data = document.getElementById(dataParam).value;
+        fetch(`${url}/buscar/${field}/${data}`)
+          .then((response) => response.json())
+          .then((data) => {
+            if (Array.isArray(data) && data.length > 0) {
+              const responseDiv = document.getElementById(responseDivId);
+              if (formId === "getHardwareByField") {
+                const promises = data.map((item) => {
+                  const tipoPromise = fetch(
+                    `http://localhost:3001/tipohardware/${item.ID_Tipohard}`
+                  )
+                    .then((res) => res.json())
+                    .then((tipoData) =>
+                      tipoData[0]
+                        ? tipoData[0].DESCRIPCION
+                        : "Descripción no disponible"
+                    );
+
+                  const marcaPromise = fetch(
+                    `http://localhost:3001/marca/${item.ID_Marca}`
+                  )
+                    .then((res) => res.json())
+                    .then((marcaData) =>
+                      marcaData[0]
+                        ? marcaData[0].DESCRIPCION
+                        : "Descripción no disponible"
+                    );
+
+                  // Retornar un objeto que contenga tanto el item original como las descripciones
+                  return Promise.all([tipoPromise, marcaPromise]).then(
+                    ([tipoDesc, marcaDesc]) => {
+                      return {
+                        ...item,
+                        tipoDescripcion: tipoDesc,
+                        marcaDescripcion: marcaDesc,
+                      };
+                    }
+                  );
+                });
+
+                return Promise.all(promises).then((enrichedData) => {
+                  // Crear el HTML para mostrar los resultados
+                  const html = enrichedData
+                    .map(
+                      (item) => `
+                  <div style="border: 1px solid #ccc; padding: 10px; margin: 5px;">
+                    ${Object.entries(item)
+                      .filter(
+                        ([key]) => !["ID_Tipohard", "ID_Marca"].includes(key)
+                      ) // Excluir IDs
+                      .map(([key, value]) => `<p>${key}: ${value}</p>`)
+                      .join("")}
+                    <p>Tipo: ${item.tipoDescripcion}</p>
+                    <p>Marca: ${item.marcaDescripcion}</p>
+                  </div>
+                  `
+                    )
+                    .join("");
+
+                  responseDiv.innerHTML = html; // Mostrar el HTML generado
+                });
+              } else {
+                // Para otros tipos de búsqueda, simplemente devolver los datos
+                const html = data
+                  .map(
+                    (item) => `
+                  <div style="border: 1px solid #ccc; padding: 10px; margin: 5px;">
+                    ${Object.entries(item)
+                      .map(([key, value]) => `<p>${key}: ${value}</p>`)
+                      .join("")}
+                  </div>
+                  `
+                  )
+                  .join("");
+
+                responseDiv.innerHTML = html; // Mostrar el HTML generado
+              }
             } else {
               document.getElementById(
                 responseDivId
@@ -278,7 +423,7 @@ document.addEventListener("DOMContentLoaded", () => {
           .then((response) => {
             if (handleResponse(response, formId)) {
               alert("Actualizado correctamente");
-              location.reload()
+              location.reload();
               idElement.readOnly = false;
               const updateForm = document.getElementById(updateFormId);
               if (updateForm) {
