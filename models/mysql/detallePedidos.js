@@ -19,7 +19,7 @@ export class detallePedidosModel {
 
   static async getById(id_detalle) {
     const [rows] = await connection.query(
-      "SELECT * FROM detalle_pedidos WHERE id_detalle = ?",
+      "SELECT * FROM detalle_pedidos WHERE IDPedido = ?",
       [id_detalle]
     );
     return rows;

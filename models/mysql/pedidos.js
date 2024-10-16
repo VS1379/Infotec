@@ -18,7 +18,7 @@ export class pedidoModel {
 
   static async getById(id) {
     const [result] = await connection.query(
-      "SELECT * FROM pedidos WHERE id = ?",
+      "SELECT * FROM pedidos WHERE IDPedido = ?",
       [id]
     );
     return result[0];
