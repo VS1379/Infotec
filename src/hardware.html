@@ -90,7 +90,7 @@
         <h3>Actualizar Tipo de Hardware</h3>
         <form id="updateTipoHardFormById">
             <label>ID: <input type="number" id="updateIdTipoHardware" required min="1" max="99"></label>
-            <button type="submit">BUSCAR</button>
+            <button type="submit" id="hardwareBuscarButton">BUSCAR</button>
             <button type="reset"><a href="hardware.html" style="text-decoration: none; color: white;">CANCELAR</a></button>
             <div id="dontExist"></div>
         </form>
@@ -130,9 +130,14 @@
         <div id="hardwareResponse"></div>
         <h3>Agregar Hardware</h3>
         <form id="createHardwareForm">
-            <label>ID: <input type="number" id="id_hard" required min="1" max="9999"></label>
-            <label>Tipo: <input type="number" id="id_tipohard" required min="1" max="99"></label>
-            <label>Marca: <input type="number" id="id_marca" required min="1" max="99"></label>
+            
+            <label>Tipo:</label>
+            <select id="tipoSelect"></select>
+            <input type="hidden" id="idTipoHardOculto">
+            <label>Marca:</label>
+            <select id="marcaSelect"></select>
+            <input type="hidden" id="idMarcaOculto">
+
             <label>Características: <input type="text" id="caracteristicas" required></label>
             <label>Precio Unitario: <input type="number" id="precio_unitario" required step="0.01" min="0.01" max="99999.99"></label>
             <label>Unidades Disponibles: <input type="number" id="unidades_disponibles" required min="1" max="999"></label>
@@ -146,14 +151,17 @@
             <div id="dontExist"></div>
         </form>
         <form id="updateHardwareForm" hidden>
-            <label>Tipo: <input type="number" id="updateTipohard" required min="1" max="99"></label>
-            <label>Marca: <input type="number" id="updateMarca" required min="1" max="99"></label>
+            <label>Tipo:</label>
+            <select id="tipoSelectUpdate"></select>
+            <input type="hidden" id="idTipoHardOcultoUpdate">
+            <label>Marca:</label>
+            <select id="marcaSelectUpdate"></select>
+            <input type="hidden" id="idMarcaOcultoUpdate">
             <label>Características: <input type="text" id="updateCaracteristicas" required></label>
             <label>Precio Unitario: <input type="number" id="updatePrecioUnitario" required step="0.01" min="0.01" max="99999.99"></label>
             <label>Unidades Disponibles: <input type="number" id="updateUnidadesDisponibles" required min="1" max="999"></label>
             <button type="submit">Actualizar Hardware</button>
         </form>
-
     </form>
     <h3>Eliminar Hardware</h3>
     <form id="deleteHardwareForm">

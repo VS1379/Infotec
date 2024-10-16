@@ -32,8 +32,9 @@ export class hardwareModel {
       precio_unitario,
       unidades_disponibles,
     } = hardware;
+
     const [result] = await connection.query(
-      "INSERT INTO hardware (id_tipohard, id_marca, caracteristicas, precio_unitario, unidades_disponibles) VALUES (?, ?, ?, ?, ?, ?)",
+      "INSERT INTO hardware (id_tipohard, id_marca, caracteristicas, precio_unitario, unidades_disponibles) VALUES (?, ?, ?, ?, ?)",
       [
         id_tipohard,
         id_marca,
@@ -46,13 +47,14 @@ export class hardwareModel {
   }
 
   static async modificar(id_hard, hardware) {
-    const {
-      id_tipohard,
-      id_marca,
-      caracteristicas,
-      precio_unitario,
-      unidades_disponibles,
-    } = hardware;
+    const { ID_Tipohard: id_tipohard } = hardware;
+    const { ID_Marca: id_marca } = hardware;
+    const { CARACTERISTICAS: caracteristicas } = hardware;
+    const { PRECIO_UNITARIO: precio_unitario } = hardware;
+    const { UNIDADES_DISPONIBLES: unidades_disponibles } = hardware;
+
+    console.log(hardware);
+    
     const [result] = await connection.query(
       "UPDATE hardware SET id_tipohard = ?, id_marca = ?, caracteristicas = ?, precio_unitario = ?, unidades_disponibles = ? WHERE id_hard = ?",
       [

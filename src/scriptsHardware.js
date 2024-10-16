@@ -17,9 +17,26 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
   document.getElementById("hardwareButton").addEventListener("click", () => {
+    cargarMarcasYTipos(
+      "marcaSelect",
+      "tipoSelect",
+      "idMarcaOculto",
+      "idTipoHardOculto"
+    );
     mainMenu.style.display = "none";
     hardwareMenu.style.display = "block";
   });
+
+  document
+    .getElementById("hardwareBuscarButton")
+    .addEventListener("click", () => {
+      cargarMarcasYTipos(
+        "marcaSelect",
+        "tipoSelect",
+        "idMarcaOculto",
+        "idTipoHardOculto"
+      );
+    });
 
   // Función para manejar la respuesta de la API
   function handleResponse(response, responseDivId) {
@@ -32,6 +49,58 @@ document.addEventListener("DOMContentLoaded", () => {
       return false; // Hubo un error
     }
     return true; // Respuesta correcta
+  }
+
+  // Función para obtener todos los registros para hardware
+  function fetchAllHardware(url, formId, responseDivId, fieldParam, dataParam) {
+    document
+      .getElementById(formId)
+      .addEventListener("submit", async function (event) {
+        event.preventDefault();
+        try {
+          const response = await fetch(url);
+          const result = await response.json();
+          if (Array.isArray(result) && result.length > 0) {
+            const responseDiv = document.getElementById(responseDivId);
+            const html = await Promise.all(
+              result.map(async (item) => {
+                if (formId === "getAllHardwareForm") {
+                  const marcaDescripcion = await getMarcaDescripcion(
+                    item.ID_Marca
+                  );
+                  const tipoHardwareDescripcion =
+                    await getTipoHardwareDescripcion(item.ID_Tipohard);
+                  return `
+              <div style="border: 1px solid #ccc; padding: 10px; margin: 5px;">
+                <p>ID Hardware: ${item.ID_Hard}</p>
+                <p>Marca: ${marcaDescripcion}</p>
+                <p>Tipo de Hardware: ${tipoHardwareDescripcion}</p>
+                <p>Características: ${item.CARACTERISTICAS}</p>
+                <p>Precio Unitario: ${item.PRECIO_UNITARIO}</p>
+                <p>Unidades Disponibles: ${item.UNIDADES_DISPONIBLES}</p>
+              </div>
+            `;
+                } else {
+                  return `
+              <div style="border: 1px solid #ccc; padding: 10px; margin: 5px;">
+                ${Object.entries(item)
+                  .map(([key, value]) => `<p>${key}: ${value}</p>`)
+                  .join("")}
+              </div>
+            `;
+                }
+              })
+            );
+            responseDiv.innerHTML = html.join("");
+          } else {
+            document.getElementById(
+              responseDivId
+            ).innerHTML = `<div>No se encontraron resultados.</div>`;
+          }
+        } catch (err) {
+          console.error("Error:", err);
+        }
+      });
   }
 
   // Función para obtener todos los registros
@@ -62,7 +131,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Obtener todos los registros
-  fetchAll(
+  fetchAllHardware(
     "http://localhost:3001/hardware",
     "getAllHardwareForm",
     "hardwareResponse"
@@ -74,8 +143,113 @@ document.addEventListener("DOMContentLoaded", () => {
   );
   fetchAll("http://localhost:3001/marca", "getAllMarcaForm", "marcaResponse");
 
-  // Función para agregar un registro
+  // Función para la carga de marcas y tipos de hardware
+  async function cargarMarcasYTipos(
+    selectMarca,
+    selectTipoHard,
+    idOcultoMarca,
+    idOcultoTipoHard
+  ) {
+    try {
+      // Fetch para obtener marcas
+      const marcasResponse = await fetch("http://localhost:3001/marca");
+      const marcas = await marcasResponse.json();
+
+      // Fetch para obtener tipos de hardware
+      const tiposResponse = await fetch("http://localhost:3001/tipohardware");
+      const tipos = await tiposResponse.json();
+
+      // Rellenar el campo de selección de marcas
+      const marcaSelect = document.getElementById(selectMarca);
+      marcaSelect.innerHTML = ""; // Limpiar opciones anteriores
+      marcas.forEach((marca) => {
+        const option = document.createElement("option");
+        option.value = marca.ID_Marca; // El ID de la marca
+        option.textContent = marca.DESCRIPCION; // El nombre de la marca
+        marcaSelect.appendChild(option);
+      });
+
+      // Rellenar el campo de selección de tipos de hardware
+      const tipoSelect = document.getElementById(selectTipoHard);
+      tipoSelect.innerHTML = ""; // Limpiar opciones anteriores
+      tipos.forEach((tipo) => {
+        const option = document.createElement("option");
+        option.value = tipo.ID_Tipohard; // El ID del tipo de hardware
+        option.textContent = tipo.DESCRIPCION; // La descripción del tipo de hardware
+        tipoSelect.appendChild(option);
+      });
+
+      // Configurar los valores de los elementos ocultos con la primera opción por defecto
+      if (marcaSelect.options.length > 0) {
+        document.getElementById(idOcultoMarca).value =
+          marcaSelect.options[0].value;
+      }
+      if (tipoSelect.options.length > 0) {
+        document.getElementById(idOcultoTipoHard).value =
+          tipoSelect.options[0].value;
+      }
+    } catch (error) {
+      console.error("Error al cargar marcas o tipos de hardware:", error);
+    }
+  }
+
+  // Función para crear registros
   function createRecord(url, formId, fields) {
+    document
+      .getElementById(formId)
+      .addEventListener("submit", function (event) {
+        event.preventDefault();
+        const record = {};
+        fields.forEach((field) => {
+          record[field] = document.getElementById(field).value;
+        });
+
+        // Obtener los IDs ocultos de marca y tipo de hardware seleccionados
+        record.id_marca = document.getElementById("idMarcaOculto").value;
+        record.id_tipohard = document.getElementById("idTipoHardOculto").value;
+
+        fetch(url, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(record),
+        })
+          .then((response) => {
+            if (response.ok) {
+              alert("Agregado correctamente");
+              document.getElementById(formId).reset();
+            } else {
+              alert("Error al agregar el registro");
+            }
+          })
+          .catch((err) => console.error("Error:", err));
+      });
+  }
+
+  // Manejo de selección para actualizar los elementos ocultos con los IDs correspondientes
+  document
+    .getElementById("marcaSelect")
+    .addEventListener("change", function () {
+      const selectedOption = this.options[this.selectedIndex];
+      document.getElementById("idMarcaOculto").value = selectedOption.value;
+    });
+
+  document.getElementById("tipoSelect").addEventListener("change", function () {
+    const selectedOption = this.options[this.selectedIndex];
+    document.getElementById("idTipoHardOculto").value = selectedOption.value;
+  });
+
+  // Llamada a la función createRecord para agregar hardware
+  createRecord(
+    "http://localhost:3001/hardware/hardwareCrear",
+    "createHardwareForm",
+    ["caracteristicas", "precio_unitario", "unidades_disponibles"]
+  );
+
+  //Funcion para agregar marca y tipoHard
+
+  function crearRecord(url, formId, fields) {
     document
       .getElementById(formId)
       .addEventListener("submit", function (event) {
@@ -100,107 +274,14 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Agregar registros
-  createRecord(
+  crearRecord(
     "http://localhost:3001/tipohardware/tipoHardwareCrear",
     "createTipoHardwareForm",
     ["descripcionTipoHardware"]
   );
-  createRecord("http://localhost:3001/marca/marcaCrear", "createMarcaForm", [
+  crearRecord("http://localhost:3001/marca/marcaCrear", "createMarcaForm", [
     "nombreMarca",
   ]);
-  createRecord("http://localhost:3001/hardware", "createHardwareForm", [
-    "id_tipohard",
-    "id_marca",
-    "caracteristicas",
-    "precio_unitario",
-    "unidades_disponibles",
-  ]);
-
-  /*
-   // Función para buscar un registro por campo
-  function fetchByField(url, formId, responseDivId, fieldParam, dataParam) {
-    document
-      .getElementById(formId)
-      .addEventListener("submit", function (event) {
-        event.preventDefault();
-        const field = document.getElementById(fieldParam).value;
-        const data = document.getElementById(dataParam).value;
-        fetch(`${url}/buscar/${field}/${data}`)
-          .then((response) => response.json())
-          .then((data) => {
-            if (Array.isArray(data) && data.length > 0) {
-              const responseDiv = document.getElementById(responseDivId);
-              const html = data
-                .map(
-                  (item) => `
-                <div style="border: 1px solid #ccc; padding: 10px; margin: 5px;">
-                ${Object.entries(item)
-                  .map(([key, value]) => `<p>${key}: ${value}</p>`)
-                  .join("")}
-                  </div>
-                  `
-                )
-                .join("");
-              responseDiv.innerHTML = html;
-            } else {
-              document.getElementById(
-                responseDivId
-              ).innerHTML = `<div>No se encontraron resultados.</div>`;
-            }
-          })
-          .catch((err) => console.error("Error:", err));
-      });
-  }
-
-  // Buscar registros por campo
-  fetchByField(
-    "http://localhost:3001/hardware",
-    "getHardwareByField",
-    "hardwareResponse",
-    "fieldHardware",
-    "dataHardware"
-  );
-  fetchByField(
-    "http://localhost:3001/tipohardware",
-    "getTipoHardwareByField",
-    "tipoHardwareResponse",
-    "fieldTipoHardware",
-    "dataTipoHardware"
-  );
-  fetchByField(
-    "http://localhost:3001/marca",
-    "getMarcaByField",
-    "marcaResponse",
-    "fieldMarca",
-    "dataMarca"
-  );
-
-  // Buscar registros por ID
-  fetchById(
-    "http://localhost:3001/hardware",
-    "updateHardwareFormById",
-    "updateHardwareForm",
-    [
-      "updateTipohard",
-      "updateMarca",
-      "updateCaracteristicas",
-      "updatePrecioUnitario",
-      "updateUnidadesDisponibles",
-    ]
-  );
-  fetchById(
-    "http://localhost:3001/tipohardware",
-    "updateTipoHardFormById",
-    "updateTipoHardForm",
-    ["updateDescripcionTipoHardware"]
-  );
-  fetchById(
-    "http://localhost:3001/marca",
-    "updateMarcaFormById",
-    "updateMarcaForm",
-    ["updateNombreMarca"]
-  );
-  */
 
   // Función para obtener la descripción de la marca
   async function getMarcaDescripcion(idMarca) {
@@ -241,7 +322,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     await getTipoHardwareDescripcion(item.ID_Tipohard);
                   return `
               <div style="border: 1px solid #ccc; padding: 10px; margin: 5px;">
-                <p>ID_Hard: ${item.ID_Hard}</p>
+                <p>ID Hardware: ${item.ID_Hard}</p>
                 <p>Marca: ${marcaDescripcion}</p>
                 <p>Tipo de Hardware: ${tipoHardwareDescripcion}</p>
                 <p>Características: ${item.CARACTERISTICAS}</p>
@@ -294,6 +375,123 @@ document.addEventListener("DOMContentLoaded", () => {
     "fieldMarca",
     "dataMarca"
   );
+
+  // Función para buscar un registro por ID y mostrar el formulario de actualización
+  function fetchByIdHardware(url, formId, updateFormId, updateId, fields) {
+    document
+      .getElementById(formId)
+      .addEventListener("submit", function (event) {
+        event.preventDefault();
+        const id = document.getElementById(updateId).value;
+        fetch(`${url}/${id}`)
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error("Registro no encontrado");
+            }
+            return response.json();
+          })
+
+          .then(async (data) => {
+            document.getElementById("dontExist").innerHTML = "";
+            const updateForm = document.getElementById(updateFormId);
+            console.log(updateForm);
+
+            if (updateForm) {
+              updateForm.hidden = false; // Mostrar el formulario de actualización
+            }
+            const updateIdField = document.getElementById(updateId);
+            if (updateIdField) {
+              updateIdField.readOnly = true; // Bloquear el campo de ID
+            }
+            console.log(updateForm);
+            // Cargar marcas y tipos de hardware
+            await cargarMarcasYTipos(
+              "marcaSelectUpdate",
+              "tipoSelectUpdate",
+              "idMarcaOcultoUpdate",
+              "idMarcaOcultoUpdate"
+            );
+
+            // Establecer los valores en el formulario
+            fields.forEach((field) => {
+              const element = document.getElementById(field);
+              if (element) {
+                element.value = data[field] || "";
+              }
+            });
+
+            // Seleccionar la marca y el tipo de hardware del registro
+            const marcaSelect = document.getElementById("marcaSelectUpdate");
+            if (marcaSelect) {
+              marcaSelect.value = data.ID_Marca || "";
+              document.getElementById("idMarcaOcultoUpdate").value =
+                data.ID_Marca || "";
+            }
+            const tipoSelect = document.getElementById("tipoSelectUpdate");
+            if (tipoSelect) {
+              tipoSelect.value = data.ID_Tipohard || "";
+              document.getElementById("idTipoHardOcultoUpdate").value =
+                data.ID_Tipohard || "";
+            }
+          })
+          .catch((err) => {
+            document.getElementById("dontExist").innerHTML =
+              "<br>El registro no existe</br>";
+            const updateForm = document.getElementById(updateFormId);
+            if (updateForm) {
+              updateForm.hidden = true; // Ocultar el formulario si no se encuentra el registro
+            }
+            const updateIdField = document.getElementById(updateId);
+            if (updateIdField) {
+              updateIdField.readOnly = false; // Desbloquear el campo de ID
+            }
+          });
+      });
+  }
+
+  // Función para actualizar un registro
+  function updateRecordHardware(url, formId, fields, updateId, updateFormId) {
+    document
+      .getElementById(formId)
+      .addEventListener("submit", function (event) {
+        event.preventDefault();
+        const record = {};
+        const idElement = document.getElementById(updateId);
+        if (!idElement) {
+          console.error("El campo ID no existe.");
+          return;
+        }
+        const id = idElement.value;
+        fields.forEach((field) => {
+          const element = document.getElementById(field);
+          if (element) {
+            const value = element.value;
+            if (value) {
+              record[field] = value;
+            }
+          }
+        });
+        fetch(`${url}/${id}`, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(record),
+        })
+          .then((response) => {
+            if (handleResponse(response, formId)) {
+              alert("Actualizado correctamente");
+              location.reload();
+              idElement.readOnly = false;
+              const updateForm = document.getElementById(updateFormId);
+              if (updateForm) {
+                updateForm.reset(); // Restablecer los campos del formulario
+              }
+            }
+          })
+          .catch((err) => console.error("Error:", err));
+      });
+  }
 
   // Función para buscar un registro por ID y mostrar el formulario de actualización
   function fetchById(url, formId, updateFormId, updateId, fields) {
@@ -386,7 +584,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Buscar y actualizar registros
-  fetchById(
+  fetchByIdHardware(
     "http://localhost:3001/hardware",
     "updateHardwareFormById",
     "updateHardwareForm",
@@ -414,7 +612,7 @@ document.addEventListener("DOMContentLoaded", () => {
     ["updateNombreMarca"]
   );
 
-  updateRecord(
+  updateRecordHardware(
     "http://localhost:3001/hardware",
     "updateHardwareForm",
     [

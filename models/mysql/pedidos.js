@@ -24,12 +24,8 @@ export class pedidoModel {
     return result[0];
   }
 
-  // static async modificar(id_marca, marca) {
-  // const { updateNombreMarca: descripcion } = marca;
-
   static async crear(datos) {
     const condicion = 1;
-    console.log(datos);
     const { cliente: IDCliente } = datos;
     const { fechaPedido: FechaHora } = datos;
     const { tipoPedido: TipoPedido } = datos;

@@ -35,6 +35,7 @@ export class hardwareController {
         try {
             const { id_hard } = req.params;
             const hardware = req.body;
+            
             const result = await hardwareModel.modificar(id_hard, hardware);
             if (result.affectedRows > 0) return res.json(result);
             res.status(404).json({ message: 'Hardware no encontrado' });
