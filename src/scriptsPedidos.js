@@ -462,26 +462,26 @@ document
   });
 
 // Validar los botones
-function validarBotones() {
-  const cantidad = document.getElementById("cantidad").value;
-  const clienteSeleccionado = document.getElementById("cliente").value;
-  const detallesPedidoBody = document
-    .getElementById("detallesPedido")
-    .querySelector("tbody");
+// function validarBotones() {
+//   const cantidad = document.getElementById("cantidad").value;
+//   const clienteSeleccionado = document.getElementById("cliente").value;
+//   const detallesPedidoBody = document
+//     .getElementById("detallesPedido")
+//     .querySelector("tbody");
 
-  // Verificar si la tabla tiene al menos una fila visible
-  const hayDetalles = Array.from(detallesPedidoBody.children).some((fila) => {
-    return fila.style.display !== "none";
-  });
+//   // Verificar si la tabla tiene al menos una fila visible
+//   const hayDetalles = Array.from(detallesPedidoBody.children).some((fila) => {
+//     return fila.style.display !== "none";
+//   });
 
-  // Habilitar/Deshabilitar botón "Agregar al Pedido"
-  document.querySelector("button[onclick='agregarDetalle()']").disabled = !(
-    cantidad && clienteSeleccionado
-  );
+//   // Habilitar/Deshabilitar botón "Agregar al Pedido"
+//   document.querySelector("button[onclick='agregarDetalle()']").disabled = !(
+//     cantidad && clienteSeleccionado
+//   );
 
-  // Habilitar/Deshabilitar botón "Finalizar Pedido"
-  document.querySelector("button[type='submit']").disabled = !hayDetalles;
-}
+//   // Habilitar/Deshabilitar botón "Finalizar Pedido"
+//   document.querySelector("button[type='submit']").disabled = !hayDetalles;
+// }
 
 // Llamar a validarBotones cuando se cambia la cantidad
 document.getElementById("cantidad").addEventListener("input", validarBotones);
