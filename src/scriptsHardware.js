@@ -461,17 +461,43 @@ document.addEventListener("DOMContentLoaded", () => {
           console.error("El campo ID no existe.");
           return;
         }
-        const id = idElement.value;
+        const id_hard = idElement.value; // Utilizar 'id_hard' para que coincida con el controlador
+
+        // Obtener los valores de los campos de tipo y marca
+        const tipoSelect = document.getElementById("tipoSelectUpdate");
+        const marcaSelect = document.getElementById("marcaSelectUpdate");
+        if (tipoSelect && tipoSelect.value) {
+          record.ID_Tipohard = tipoSelect.value; // Asignar el ID del tipo de hardware
+        }
+        if (marcaSelect && marcaSelect.value) {
+          record.ID_Marca = marcaSelect.value; // Asignar el ID de la marca
+        }
+
+        // Recorrer los campos adicionales y asignar al objeto 'record'
         fields.forEach((field) => {
           const element = document.getElementById(field);
           if (element) {
             const value = element.value;
             if (value) {
-              record[field] = value;
+              switch (field) {
+                case "updateCaracteristicas":
+                  record.CARACTERISTICAS = value;
+                  break;
+                case "updatePrecioUnitario":
+                  record.PRECIO_UNITARIO = value;
+                  break;
+                case "updateUnidadesDisponibles":
+                  record.UNIDADES_DISPONIBLES = value;
+                  break;
+                default:
+                  record[field] = value;
+              }
             }
           }
         });
-        fetch(`${url}/${id}`, {
+
+        // Enviar la solicitud PATCH al servidor con el objeto 'record'
+        fetch(`${url}/${id_hard}`, {
           method: "PATCH",
           headers: {
             "Content-Type": "application/json",
