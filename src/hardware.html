@@ -58,8 +58,8 @@
         </form>
         <h3>Eliminar Marca</h3>
         <form id="deleteMarcaForm">
-            <label>ID: <input type="number" id="deleteId" required min="1" max="99"></label>
-            <button type="submit">Eliminar Marca</button>
+            <label>ID: <input type="number" id="deleteIdMarca" required min="1" max="99"></label>
+            <button onclick="eliminarMarca()">Eliminar Marca</button>
         </form>
         <a href="hardware.html">Volver</a>
     </section>
@@ -100,8 +100,8 @@
         </form>
         <h3>Eliminar Tipo de Hardware</h3>
         <form id="deleteTipoHardwareForm">
-            <label>ID: <input type="number" id="deleteId" required min="1" max="99"></label>
-            <button type="submit">Eliminar Tipo de Hardware</button>
+            <label>ID: <input type="number" id="deleteIdTipoHardware" required min="1" max="999"></label>
+            <button onclick="eliminarTipoHardware()">Eliminar Tipo Hard</button>
         </form>
         <a href="hardware.html">Volver</a>
     </section>
@@ -165,8 +165,8 @@
     </form>
     <h3>Eliminar Hardware</h3>
     <form id="deleteHardwareForm">
-        <label>ID: <input type="number" id="deleteId" required min="1" max="9999"></label>
-        <button type="submit">Eliminar Hardware</button>
+        <label>ID: <input type="number" id="deleteIdHardware" required min="1" max="9999"></label>
+        <button type="submit" onclick="eliminarHardware()">Eliminar Hardware</button>
     </form>
     <a href="hardware.html">Volver</a>
 </section>

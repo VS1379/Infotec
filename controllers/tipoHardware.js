@@ -60,6 +60,35 @@ export class tipoHardwareController {
     }
   }
 
+  static async verificarDependencias(req, res) {
+    try {
+      const { id_tipohard } = req.params;
+      const dependencias = await tipoHardwareModel.obtenerDependencias(
+        id_tipohard
+      );
+      res.json(dependencias);
+    } catch (error) {
+      res.status(500).json({ message: "Error al verificar dependencias" });
+    }
+  }
+
+  static async eliminarConConfirmacion(req, res) {
+    try {
+      const { id_tipohard } = req.params;
+      const result = await tipoHardwareModel.eliminarConDependencias(
+        id_tipohard
+      );
+      if (result) {
+        return res.status(204).end();
+      }
+      res.status(404).json({ message: "Tipo de hardware no encontrado" });
+    } catch (error) {
+      res
+        .status(500)
+        .json({ message: "Error al eliminar el tipo de hardware" });
+    }
+  }
+
   static async buscarPorCampo(req, res) {
     try {
       const { campo, valor } = req.params;

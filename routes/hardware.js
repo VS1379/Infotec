@@ -16,6 +16,8 @@ hardwareRouter.patch('/:id_hard', hardwareController.modificar);
 
 // Eliminar hardware
 hardwareRouter.delete('/:id_hard', hardwareController.eliminar);
+hardwareRouter.delete('/checkDependencies/:id', hardwareController.eliminar);
+hardwareRouter.delete('/:id_hard', hardwareController.eliminar);
 
 // Buscar hardware por campo
 hardwareRouter.get('/buscar/:campo/:valor', hardwareController.buscarPorCampo);

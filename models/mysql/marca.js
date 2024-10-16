@@ -50,6 +50,26 @@ export class marcaModel {
     return result.affectedRows > 0;
   }
 
+  static async eliminarConDependencias(id_marca) {
+    await connection.query("DELETE FROM hardware WHERE ID_Marca = ?", [
+      id_marca,
+    ]);
+    const [result] = await connection.query(
+      "DELETE FROM marca WHERE ID_Marca = ?",
+      [id_marca]
+    );
+    return result.affectedRows > 0;
+  }
+
+  static async obtenerDependencias(id_marca) {
+    const [dependencias] = await connection.query(
+      "SELECT * FROM hardware WHERE ID_Marca = ?",
+      [id_marca]
+    );
+
+    return dependencias;
+  }
+
   static async buscarPorCampo(campo, valor) {
     const [rows] = await connection.query(
       `SELECT * FROM marca WHERE ${campo} LIKE ?`,

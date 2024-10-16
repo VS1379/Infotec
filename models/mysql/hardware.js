@@ -54,7 +54,7 @@ export class hardwareModel {
     const { UNIDADES_DISPONIBLES: unidades_disponibles } = hardware;
 
     console.log(hardware);
-    
+
     const [result] = await connection.query(
       "UPDATE hardware SET id_tipohard = ?, id_marca = ?, caracteristicas = ?, precio_unitario = ?, unidades_disponibles = ? WHERE id_hard = ?",
       [
@@ -68,6 +68,26 @@ export class hardwareModel {
     );
     return result;
   }
+
+  static async verificarDependencias(id_hard) {
+    // Consulta para verificar si el hardware está en uso en las tablas relacionadas
+    const [ventas] = await connection.query(
+        "SELECT COUNT(*) as count FROM detalle_facturas_venta WHERE IDHard = ?",
+        [id_hard]
+    );
+    const [compras] = await connection.query(
+        "SELECT COUNT(*) as count FROM detalle_facturas_compra WHERE IDHard = ?",
+        [id_hard]
+    );
+    const [pedidos] = await connection.query(
+        "SELECT COUNT(*) as count FROM detalle_pedidos WHERE IDHard = ?",
+        [id_hard]
+    );
+
+    // Retorna true si existen dependencias, false en caso contrario
+    return ventas[0].count > 0 || compras[0].count > 0 || pedidos[0].count > 0;
+}
+
 
   static async eliminar(id_hard) {
     const [result] = await connection.query(

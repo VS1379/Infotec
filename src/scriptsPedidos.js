@@ -331,7 +331,7 @@ async function finalizarPedido(event) {
 
     // Mensaje de éxito y limpieza del formulario
     alert("Pedido registrado y detalles agregados exitosamente.");
-    imprimirComprobante()
+    imprimirComprobante();
     document.getElementById("formPedido").reset();
     document.getElementById("detallesPedido").querySelector("tbody").innerHTML =
       "";

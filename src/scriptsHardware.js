@@ -529,7 +529,7 @@ document.addEventListener("DOMContentLoaded", () => {
         fetch(`${url}/${id}`)
           .then((response) => {
             if (!response.ok) {
-              throw new Error("Registro no encontrado");
+              return alert("El id solicitado no existe");
             }
             return response.json();
           })
@@ -665,36 +665,149 @@ document.addEventListener("DOMContentLoaded", () => {
     "updateIdMarca",
     "updateMarcaFormById"
   );
+});
 
-  // Función para eliminar un registro con verificación de dependencias
-  function deleteRecord(url, formId) {
-    document
-      .getElementById(formId)
-      .addEventListener("submit", function (event) {
-        event.preventDefault();
-        const id = document.getElementById("deleteId").value;
-        fetch(`${url}/${id}`, { method: "DELETE" })
-          .then((response) => {
-            if (!response.ok) {
-              throw new Error(
-                `Error: ${response.status} - ${response.statusText}`
-              );
-            }
-            return response.text(); // Cambiar a text() en lugar de json()
-          })
-          .then(() => {
-            alert("Eliminado correctamente");
-            document.getElementById(formId).reset(); // Limpiar el formulario después de eliminar
-          })
-          .catch((err) => {
-            console.error("Error:", err);
-            alert(err.message); // Mostrar el mensaje de error en una alerta
-          });
-      });
+// Eliminar
+async function eliminarMarca() {
+  document
+    .getElementById("deleteMarcaForm")
+    .addEventListener("submit", (event) => {
+      event.preventDefault();
+    });
+
+  const id_marca = document.getElementById("deleteIdMarca").value;
+  if (!id_marca) {
+    alert("Por favor, ingrese un ID de marca válido.");
+    return;
   }
 
-  // Eliminar registros
-  deleteRecord("http://localhost:3001/hardware", "deleteHardwareForm");
-  deleteRecord("http://localhost:3001/tipohardware", "deleteTipoHardwareForm");
-  deleteRecord("http://localhost:3001/marca", "deleteMarcaForm");
-});
+  try {
+    // Verificar si el registro existe
+    const registroResponse = await fetch(
+      `http://localhost:3001/marca/${id_marca}`
+    );
+
+    if (!registroResponse.ok) {
+      alert("No se encuentra la id solicitada");
+      return;
+    }
+
+    // Verificar dependencias
+    const response = await fetch(
+      `http://localhost:3001/marca/verificarDependencias/${id_marca}`
+    );
+    const dependencies = await response.json();
+
+    if (dependencies.length > 0) {
+      // Mostrar diálogo de confirmación
+      const confirmDelete = confirm(
+        "La marca tiene dependencias. ¿Desea eliminar la marca y todas sus dependencias?"
+      );
+
+      if (confirmDelete) {
+        // Si el usuario acepta, eliminar con confirmación
+        await fetch(
+          `http://localhost:3001/marca/eliminarConConfirmacion/${id_marca}`,
+          {
+            method: "DELETE",
+          }
+        );
+        alert("Marca y dependencias eliminadas correctamente.");
+      } else {
+        alert("Eliminación cancelada.");
+      }
+    } else {
+      await fetch(`http://localhost:3001/marca/${id_marca}`, {
+        method: "DELETE",
+      });
+      alert("Marca eliminada correctamente.");
+    }
+  } catch (error) {
+    alert("Error al eliminar la marca.");
+    console.error(error);
+  }
+}
+
+async function eliminarTipoHardware() {
+  document
+    .getElementById("deleteTipoHardwareForm")
+    .addEventListener("submit", (event) => {
+      event.preventDefault();
+    });
+
+  const id_tipoHardware = document.getElementById("deleteIdTipoHardware").value;
+  if (!id_tipoHardware) {
+    alert("Por favor, ingrese un ID de Tipo Hardware valido.");
+    return;
+  }
+
+  try {
+    const registroResponse = await fetch(
+      `http://localhost:3001/tipohardware/${id_tipoHardware}`
+    );
+
+    if (!registroResponse.ok) {
+      alert("No se encuentra la id solicitada");
+      return;
+    }
+
+    // Verificar dependencias
+    const response = await fetch(
+      `http://localhost:3001/tipoHardware/verificarDependencias/${id_tipoHardware}`
+    );
+    const dependencies = await response.json();
+
+    if (dependencies.length > 0) {
+      const confirmDelete = confirm(
+        "La marca tiene dependencias. ¿Desea eliminar el tipoHardware y todas sus dependencias?"
+      );
+
+      if (confirmDelete) {
+        await fetch(
+          `http://localhost:3001/tipohardware/eliminarConConfirmacion/${id_tipoHardware}`,
+          {
+            method: "DELETE",
+          }
+        );
+        alert("Tipo Hardware y sus dependencias eliminadas correctamente.");
+      } else {
+        alert("Eliminación cancelada.");
+      }
+    } else {
+      await fetch(`http://localhost:3001/tipohardware/${id_tipoHardware}`, {
+        method: "DELETE",
+      });
+      alert("Tipo Hardware eliminado correctamente.");
+    }
+  } catch (error) {
+    alert("Error al eliminar el Tipo Hardware.");
+    console.error(error);
+  }
+}
+
+function eliminarHardware() {
+  document
+    .getElementById("deleteHardwareForm")
+    .addEventListener("submit", (event) => {
+      event.preventDefault();
+    });
+  let url = "http://localhost:3001/hardware";
+  let formId = "deleteHardwareForm";
+  document.getElementById(formId).addEventListener("submit", function (event) {
+    event.preventDefault();
+    const id = document.getElementById("deleteIdHardware").value;
+    fetch(`${url}/${id}`, { method: "DELETE" })
+      .then((response) => {
+        if (!response.ok) {
+          alert("No se encuentra el ID solicitado");
+          throw new Error("El ID no existe");
+        } else {
+          alert("Eliminado correctamente");
+          document.getElementById(formId).reset();
+        }
+      })
+      .catch((err) => {
+        console.error("Error:", err);
+      });
+  });
+}

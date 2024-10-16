@@ -59,6 +59,29 @@ export class marcaController {
     }
   }
 
+  static async verificarDependencias(req, res) {
+    try {
+      const { id_marca } = req.params;
+      const dependencias = await marcaModel.obtenerDependencias(id_marca);
+      res.json(dependencias);
+    } catch (error) {
+      res.status(500).json({ message: "Error al verificar dependencias" });
+    }
+  }
+
+  static async eliminarConConfirmacion(req, res) {
+    try {
+      const { id_marca } = req.params;
+      const result = await marcaModel.eliminarConDependencias(id_marca);
+      if (result) {
+        return res.status(204).end();
+      }
+      res.status(404).json({ message: "Marca no encontrada" });
+    } catch (error) {
+      res.status(500).json({ message: "Error al eliminar la marca" });
+    }
+  }
+
   static async buscarPorCampo(req, res) {
     try {
       const { campo, valor } = req.params;
