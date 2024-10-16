@@ -19,5 +19,5 @@ pedidosRouter.post('/:id/detalles', pedidoController.agregarDetalle);
 pedidosRouter.delete('/:id', pedidoController.eliminar);
 
 // Dar de baja un pedido
-pedidosRouter.patch('/:numeroPedido/cancelar', pedidoController.cancelar);
+pedidosRouter.put('/cancelar/:numeroPedido', pedidoController.cancelar);
 

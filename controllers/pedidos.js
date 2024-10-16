@@ -59,23 +59,22 @@ export class pedidoController {
   static async cancelar(req, res) {
     try {
       const { numeroPedido } = req.params;
-      const pedido = await pedidoModel.getByNumeroPedido(numeroPedido);
+      console.log(req.body);
 
-      if (
-        !pedido ||
-        (pedido.condicion !== "Registrado" &&
-          pedido.condicion !== "Presupuestado")
-      ) {
+      const pedido = await pedidoModel.getById(numeroPedido);
+      console.log(pedido);
+      
+      if (!pedido || pedido.condicion === 1) {
         return res
           .status(400)
           .json({ message: "No se puede cancelar el pedido" });
       }
-
       // Actualizar la condición a "Cancelado"
       await pedidoModel.actualizarCondicion(numeroPedido, "Cancelado");
 
       res.json({ message: "Pedido cancelado correctamente" });
     } catch (error) {
+      console.error(error);
       res.status(500).json({ message: "Error al cancelar el pedido" });
     }
   }

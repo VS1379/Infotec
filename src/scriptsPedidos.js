@@ -134,7 +134,7 @@ async function cargarHardwarePorTipoYMarca() {
     hardwareFiltrado.forEach((hardware) => {
       const option = document.createElement("option");
       option.value = hardware.ID_Hard;
-      option.textContent = `${hardware.CARACTERISTICAS} - $${hardware.PRECIO_UNITARIO}`;
+      option.textContent = `${hardware.CARACTERISTICAS} - $${hardware.PRECIO_UNITARIO} Cant. ${hardware.UNIDADES_DISPONIBLES}`;
       selectElement.appendChild(option);
     });
 
@@ -227,12 +227,6 @@ function agregarHardwareATabla() {
   } else {
     alert("Por favor, selecciona un hardware válido.");
   }
-}
-
-// Función para obtener el precio unitario (ejemplo)
-function getPrecioUnitario(idHard) {
-  // Aquí deberías implementar la lógica para obtener el precio según el ID_Hard
-  return 100; // Reemplaza esto con el valor correcto
 }
 
 // Función para finalizar el pedido
@@ -389,51 +383,6 @@ function imprimirComprobante() {
   nuevaVentana.print();
 }
 
-function agregarDetalle() {
-  const tipoHardware =
-    document.getElementById("tipoHardware").selectedOptions[0].textContent;
-  const marcaHardware =
-    document.getElementById("marcaHardware").selectedOptions[0].textContent;
-  const hardwareSelect = document.getElementById("hardware");
-  const idHardware = hardwareSelect.value;
-  const hardwareCaracteristicas = hardwareSelect.selectedOptions[0].textContent;
-  const cantidad = document.getElementById("cantidad").value;
-  const stock = 100; // Reemplazar con el stock real si es necesario
-  const estado = stock >= cantidad ? "Disponible" : "Sin stock";
-
-  if (!idHardware || cantidad === "" || cantidad <= 0) {
-    alert("Debe seleccionar un hardware válido y una cantidad mayor a 0.");
-    return;
-  }
-
-  // Crear la fila para la tabla de detalles del pedido
-  const tbody = document.querySelector("#detallesPedido tbody");
-  const fila = document.createElement("tr");
-
-  fila.innerHTML = `
-    <td>${tipoHardware}</td>
-    <td>${marcaHardware}</td>
-    <td>${hardwareCaracteristicas}</td>
-    <td>$${hardwareCaracteristicas.split(" - $")[1]}</td>
-    <td>${cantidad}</td>
-    <td>${stock}</td>
-    <td>${estado}</td>
-  `;
-
-  // Crear el campo oculto para almacenar el ID del hardware
-  const inputHidden = document.createElement("input");
-  inputHidden.type = "hidden";
-  inputHidden.value = idHardware;
-  fila.appendChild(inputHidden);
-
-  // Agregar la fila al cuerpo de la tabla
-  tbody.appendChild(fila);
-
-  // Limpiar el formulario después de agregar el detalle
-  document.getElementById("cantidad").value = "";
-  document.getElementById("hardware").selectedIndex = 0;
-}
-
 // Función para obtener información del cliente seleccionado
 async function obtenerCliente(clienteId) {
   const response = await fetch(`http://localhost:3001/clientes/${clienteId}`);
@@ -458,33 +407,7 @@ document
     } else {
       document.getElementById("infoCliente").style.display = "none";
     }
-    validarBotones();
   });
-
-// Validar los botones
-// function validarBotones() {
-//   const cantidad = document.getElementById("cantidad").value;
-//   const clienteSeleccionado = document.getElementById("cliente").value;
-//   const detallesPedidoBody = document
-//     .getElementById("detallesPedido")
-//     .querySelector("tbody");
-
-//   // Verificar si la tabla tiene al menos una fila visible
-//   const hayDetalles = Array.from(detallesPedidoBody.children).some((fila) => {
-//     return fila.style.display !== "none";
-//   });
-
-//   // Habilitar/Deshabilitar botón "Agregar al Pedido"
-//   document.querySelector("button[onclick='agregarDetalle()']").disabled = !(
-//     cantidad && clienteSeleccionado
-//   );
-
-//   // Habilitar/Deshabilitar botón "Finalizar Pedido"
-//   document.querySelector("button[type='submit']").disabled = !hayDetalles;
-// }
-
-// Llamar a validarBotones cuando se cambia la cantidad
-document.getElementById("cantidad").addEventListener("input", validarBotones);
 
 // Modificar la función agregarDetalle para llamar a validarBotones
 function agregarDetalle() {
@@ -495,8 +418,11 @@ function agregarDetalle() {
   const hardwareSelect = document.getElementById("hardware");
   const idHardware = hardwareSelect.value;
   const hardwareCaracteristicas = hardwareSelect.selectedOptions[0].textContent;
+
+  const partes = hardwareCaracteristicas.split(" - $")[1]
+  const precio = partes[0]
   const cantidad = document.getElementById("cantidad").value;
-  const stock = 100; // Reemplazar con el stock real si es necesario
+  const stock = partes[1]
   const estado = stock >= cantidad ? "Disponible" : "Sin stock";
 
   if (!idHardware || cantidad === "" || cantidad <= 0) {
@@ -513,7 +439,7 @@ function agregarDetalle() {
     <td>${tipoHardware}</td>
     <td>${marcaHardware}</td>
     <td>${hardwareCaracteristicas}</td>
-    <td>$${hardwareCaracteristicas.split(" - $")[1]}</td>
+    <td>$${precio}</td>
     <td>${cantidad}</td>
     <td>${stock}</td>
     <td>${estado}</td>

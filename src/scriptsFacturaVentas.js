@@ -1,7 +1,41 @@
 document.addEventListener("DOMContentLoaded", function () {
   cargarPedidos();
 });
+/*
+document.addEventListener("DOMContentLoaded", () => {
+  const facturaInput = document.getElementById("numeroFactura");
+  const messageContainer = document.getElementById("facturaMessage");
+  const submitButton = document.getElementById("submitButton");
+  facturaInput.addEventListener("blur", async () => {
+    const facturaNumber = facturaInput.value;
+    messageContainer.textContent = "";
 
+    if (facturaNumber) {
+      try {
+        const response = await fetch(
+          `http://localhost:3001/facturaventa/${facturaNumber}`
+        );
+
+        if (!response.ok) {
+          throw new Error("Error en la petición");
+        }
+
+        const data = await response.json();
+
+        if (data) {
+          messageContainer.textContent = "Nro no disponible";
+          messageContainer.style.color = "red";
+          submitButton.disabled = true;
+        } else {
+          submitButton.disabled = false;
+        }
+      } catch (error) {
+        console.error("Error al verificar el número de factura:", error);
+      }
+    }
+  });
+});
+*/
 function cargarPedidos() {
   fetch("http://localhost:3001/pedidos")
     .then((response) => response.json())
@@ -63,7 +97,6 @@ function cargarDetallesPedido(pedidoId) {
           .then((hardware) => {
             // Asegúrate de que hardware sea un array y tiene elementos
             if (Array.isArray(hardware) && hardware.length > 0) {
-              
               hardware.forEach((item) => {
                 // Recorrer cada hardware
                 const row = grillaHardware.insertRow();
@@ -190,34 +223,151 @@ function eliminarItem(idHard, row) {
 }
 
 function finalizarVenta() {
-  // ... (Código existente)
+  const pedidoSelect = document.getElementById("pedido");
+  const idCliente = pedidoSelect.value; // Obtener el ID del cliente desde el select
 
-  // Lógica para actualizar unidades disponibles de hardware y condición del pedido
-  const detallesTable = document
-    .getElementById("grillaHardware")
-    .getElementsByTagName("tbody")[0];
-  for (let row of detallesTable.rows) {
-    const idHard = row.getAttribute("data-id");
-    const cantidad = parseInt(row.cells[4].textContent); // Modifica el índice si es necesario
-
-    // Actualiza unidades disponibles en el hardware
-    fetch(`http://localhost:3001/hardware/actualizar/${idHard}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ cantidadVendida: cantidad }),
-    });
+  if (!idCliente) {
+      alert("Por favor, seleccione un pedido.");
+      return; // Salir de la función si no se seleccionó un pedido
   }
 
-  // Actualiza el estado del pedido
-  fetch(`http://localhost:3001/pedidos/actualizar/${pedidoId}`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ condicion: "Finalizado" }),
+  const iva = parseFloat(document.getElementById("IVA").value) / 100;
+  const detallesTable = document.getElementById("detallesVenta").querySelector("tbody");
+  const promesas = []; // Array para almacenar todas las promesas
+
+  // Variable para almacenar el monto total de la factura
+  let montoTotalFactura = 0;
+
+  // Iterar sobre cada fila de la tabla de detalles
+  for (let row of detallesTable.rows) {
+      const idHard = row.getAttribute("data-id");
+      const cantidad = parseInt(row.cells[4].textContent);
+      const precioUnitario = parseFloat(row.cells[5].textContent);
+      const precioTotal = (precioUnitario * cantidad * (1 + iva)).toFixed(2); // Calcular el precio total
+
+      // Acumular el monto total de la factura
+      montoTotalFactura += parseFloat(precioTotal);
+
+      // Verificar stock y actualizar hardware
+      const stockPromise = fetch(`http://localhost:3001/hardware/${idHard}`)
+          .then((response) => response.json())
+          .then((hardware) => {
+              const stockActual = hardware[0].UNIDADES_DISPONIBLES;
+
+              if (stockActual >= cantidad) {
+                  // Preparar los datos para actualizar el hardware
+                  const updatedHardware = {
+                      ID_Hard: hardware[0].ID_Hard,
+                      ID_Tipohard: hardware[0].ID_Tipohard,
+                      ID_Marca: hardware[0].ID_Marca,
+                      CARACTERISTICAS: hardware[0].CARACTERISTICAS,
+                      PRECIO_UNITARIO: hardware[0].PRECIO_UNITARIO,
+                      UNIDADES_DISPONIBLES: stockActual - cantidad, // Restar cantidad al stock
+                  };
+
+                  // Actualizar unidades disponibles en el hardware
+                  return fetch(`http://localhost:3001/hardware/${idHard}`, {
+                      method: "PATCH",
+                      headers: {
+                          "Content-Type": "application/json",
+                      },
+                      body: JSON.stringify(updatedHardware),
+                  });
+              } else {
+                  alert(`No hay suficiente stock para el hardware ID: ${idHard}. Stock actual: ${stockActual}.`);
+                  throw new Error(`Stock insuficiente para ID: ${idHard}`); // Lanza un error si no hay suficiente stock
+              }
+          })
+          .catch((error) => console.error("Error al verificar stock:", error));
+
+      // Agregar la promesa de stock al array
+      promesas.push(stockPromise);
+
+      // Guardar detalles de la factura
+      const detallesFacturaPromise = stockPromise.then(() => {
+          // Preparar los datos para los detalles de la factura
+          const detallesFactura = {
+              NroFacv: document.getElementById("numeroFactura").value, // Obtenido del input
+              IDHard: idHard,
+              PrecioUnitario: precioUnitario,
+              Cantidad: cantidad,
+              PrecioTotal: precioTotal,
+              IVA: (precioTotal * iva).toFixed(2),
+              PrecioIVA: (parseFloat(precioTotal) + (precioTotal * iva)).toFixed(2),
+          };
+
+          // Hacer la solicitud para guardar los detalles de la factura
+          return fetch(`http://localhost:3001/detallesFactura`, {
+              method: "POST",
+              headers: {
+                  "Content-Type": "application/json",
+              },
+              body: JSON.stringify(detallesFactura),
+          });
+      });
+
+      // Agregar la promesa de detalles de factura al array
+      promesas.push(detallesFacturaPromise);
+  }
+
+  // Promesa para cancelar el pedido
+  const cancelarPedidoPromise = fetch(`http://localhost:3001/pedidos/cancelar/${pedidoId}`, {
+      method: "PUT",
+      headers: {
+          "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ condicion: 2 }),
   });
 
-  // ... (Código existente para registrar la venta y generar factura)
+  // Agregar la promesa de cancelar pedido al array
+  promesas.push(cancelarPedidoPromise);
+
+  // Crear y guardar la factura
+  const factura = {
+      NroFacv: document.getElementById("numeroFactura").value, // Número de factura ingresado manualmente
+      IDCliente: idCliente, // ID del cliente extraído del select
+      IDPedido: pedidoId, // Debes tener la variable `pedidoId` definida con el ID del pedido
+      Fecha: new Date().toISOString(), // Fecha actual
+      MontoTotal: montoTotalFactura.toFixed(2), // Monto total de la factura
+      FormaDePago: document.getElementById("formaDePago").value, // Obtener el método de pago
+      CantidadDeCuotas: document.getElementById("cantidadCuotas").value, // Obtener el número de cuotas
+      PeriodoDeCuotas: document.getElementById("periodoCuotas").value, // Obtener el período de cuotas
+  };
+
+  // Hacer la solicitud para guardar la factura
+  const guardarFacturaPromise = fetch(`http://localhost:3001/facturas/ventasCrear`, {
+      method: "POST",
+      headers: {
+          "Content-Type": "application/json",
+      },
+      body: JSON.stringify(factura),
+  });
+
+  // Agregar la promesa de guardar factura al array
+  promesas.push(guardarFacturaPromise);
+
+  // Esperar a que todas las promesas se completen
+  Promise.all(promesas)
+      .then(() => {
+          alert("Venta finalizada exitosamente!");
+          limpiarFormulario();
+      })
+      .catch((error) => {
+          console.error("Error al finalizar la venta:", error);
+          alert("Hubo un error al finalizar la venta. Verifica los detalles.");
+      });
+}
+
+
+// Función para limpiar el formulario
+function limpiarFormulario() {
+  document.getElementById("pedidoId").value = "";
+  document.getElementById("IVA").value = "";
+  document.getElementById("numeroFactura").value = "";
+  document.getElementById("cantCuotas").value = "";
+
+  const detallesTable = document
+    .getElementById("detallesVenta")
+    .querySelector("tbody");
+  detallesTable.innerHTML = "";
 }

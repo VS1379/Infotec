@@ -24,6 +24,14 @@ export class pedidoModel {
     return result[0];
   }
 
+  static async actualizarCondicion(id, condicion) {
+    const [result] = await connection.query(
+      "UPDATE pedidos SET condicion = ? WHERE IDPedido = ?",
+      [condicion, id]
+    );
+    return result;
+  }
+
   static async crear(datos) {
     const condicion = 1;
     const { cliente: IDCliente } = datos;

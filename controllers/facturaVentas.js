@@ -4,11 +4,6 @@ export const ventaController = {
   async getAll(req, res) {
     try {
       const ventas = await ventaModel.getAll();
-
-      if (ventas.length === 0) {
-        res.json({ error: "Ventas no encontradas" });
-      }
-
       res.json(ventas);
     } catch (error) {
       console.error("Error al obtener las ventas:", error);
@@ -20,22 +15,24 @@ export const ventaController = {
     try {
       const {
         numeroFactura,
-        pedidoId,
+        IdCliente,
+        IdPedido,
         fechaVenta,
         montoTotal,
         formaPago,
-        cuotas,
-        tipoPeriodo,
+        cantCuotas,
+        periodoCuotas,
       } = req.body;
 
       await ventaModel.crear({
         numeroFactura,
-        pedidoId,
+        IdCliente,
+        IdPedido,
         fechaVenta,
         montoTotal,
         formaPago,
-        cuotas,
-        tipoPeriodo,
+        cantCuotas,
+        periodoCuotas,
       });
 
       res.status(201).json({ message: "Venta creada exitosamente" });
@@ -47,17 +44,25 @@ export const ventaController = {
 
   async modificar(req, res) {
     const { numeroFactura } = req.params;
-    const { pedidoId, fechaVenta, montoTotal, formaPago, cuotas, tipoPeriodo } =
-      req.body;
+    const {
+      IdCliente,
+      IdPedido,
+      fechaVenta,
+      montoTotal,
+      formaPago,
+      cantCuotas,
+      periodoCuotas,
+    } = req.body;
 
     try {
       const result = await ventaModel.modificar(numeroFactura, {
-        pedidoId,
+        IdCliente,
+        IdPedido,
         fechaVenta,
         montoTotal,
         formaPago,
-        cuotas,
-        tipoPeriodo,
+        cantCuotas,
+        periodoCuotas,
       });
 
       if (result.affectedRows === 0) {

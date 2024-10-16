@@ -17,51 +17,61 @@ export class ventaModel {
   }
   static async crear({
     numeroFactura,
-    pedidoId,
+    IdCliente,
+    IdPedido,
     fechaVenta,
     montoTotal,
     formaPago,
-    cuotas,
-    tipoPeriodo,
+    cantCuotas,
+    periodoCuotas,
   }) {
     const query = `
-      INSERT INTO facturas_venta (numero_factura, pedido_id, fecha_venta, monto_total, forma_pago, cuotas, tipo_periodo)
+      INSERT INTO facturas_venta (NroFacv, IDCliente, IDPedido,	Fecha, MontoTotal,	FormaDePago,	CantidadDeCuotas,	PeriodoDeCuotas)
       VALUES (?, ?, ?, ?, ?, ?, ?)
     `;
     await connection.query(query, [
       numeroFactura,
-      pedidoId,
+      IdCliente,
+      IdPedido,
       fechaVenta,
       montoTotal,
       formaPago,
-      cuotas,
-      tipoPeriodo,
+      cantCuotas,
+      periodoCuotas,
     ]);
   }
 
   static async getByNumeroFactura(numeroFactura) {
     const [rows] = await connection.query(
-      "SELECT * FROM facturas_venta WHERE numero_factura = ?",
+      "SELECT * FROM facturas_venta WHERE NroFacv = ?",
       [numeroFactura]
     );
     return rows[0];
   }
 
   static async modificar(numeroFactura, datos) {
-    const { pedidoId, fechaVenta, montoTotal, formaPago, cuotas, tipoPeriodo } =
-      datos;
-    const query = `
-      UPDATE facturas_venta
-      SET pedido_id = ?, fecha_venta = ?, monto_total = ?, forma_pago = ?, cuotas = ?, tipo_periodo = ?
-      WHERE numero_factura = ?
-    `;
-    const [result] = await connection.query(query, [
-      pedidoId,
+    const {
+      IdCliente,
+      IdPedido,
       fechaVenta,
       montoTotal,
       formaPago,
-      cuotas,
-      tipoPeriodo,
+      cantCuotas,
+      periodoCuotas,
+    } = datos;
+    const query = `
+      UPDATE facturas_venta
+      SET IDCliente =?, IDPedido=?,	Fecha=?, MontoTotal=?,	FormaDePago=?,	CantidadDeCuotas=?,	PeriodoDeCuotas=?
+      WHERE NroFacv = ?
+    `;
+    const [result] = await connection.query(query, [
+      IdCliente,
+      IdPedido,
+      fechaVenta,
+      montoTotal,
+      formaPago,
+      cantCuotas,
+      periodoCuotas,
       numeroFactura,
     ]);
     return result;
@@ -71,7 +81,7 @@ export class ventaModel {
   static async eliminarItem(numeroFactura) {
     const query = `
       DELETE FROM facturas_venta
-      WHERE numero_factura = ?
+      WHERE NroFacv = ?
     `;
     await connection.query(query, [numeroFactura]);
   }
