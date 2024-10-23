@@ -1,0 +1,63 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+    color: #333;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+}
+
+main {
+    margin-top: 50px;
+}
+
+h1 {
+    font-size: 2.5em;
+    color: #444;
+    margin-bottom: 20px;
+}
+
+.menu {
+    list-style: none;
+    padding: 0;
+    display: inline-block;
+}
+
+.menu li {
+    margin: 10px 0;
+}
+
+.menu a {
+    display: inline-block;
+    text-decoration: none;
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 1.2em;
+    width: 250px; /* Ajusta el ancho del botón */
+    transition: background-color 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+}
+
+.menu a:hover {
+    background-color: #45a049;
+}
+
+.icon {
+    width: 40px; /* Aumenta el tamaño de la imagen */
+    height: 40px; /* Aumenta el tamaño de la imagen */
+    margin-right: 10px;
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+    .menu a {
+        font-size: 1em;
+        padding: 10px 15px;
+        width: 200px; /* Ajusta el ancho para pantallas más pequeñas */
+    }
+}

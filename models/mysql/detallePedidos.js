@@ -17,10 +17,10 @@ export class detallePedidosModel {
     return rows;
   }
 
-  static async getById(id_detalle) {
+  static async getById(id_pedido) {
     const [rows] = await connection.query(
       "SELECT * FROM detalle_pedidos WHERE IDPedido = ?",
-      [id_detalle]
+      [id_pedido]
     );
     return rows;
   }
@@ -34,19 +34,30 @@ export class detallePedidosModel {
     return result;
   }
 
-  static async modificar(id_detalle, detalle) {
-    const { IDPedido, IDHard, CANTIDAD } = detalle;
+  static async modificar(id_pedido, detalle) {
+    const { IDHard, CANTIDAD } = detalle;
     const [result] = await connection.query(
-      "UPDATE detalle_pedidos SET IDPedido = ?, IDHard = ?, CANTIDAD = ? WHERE id_detalle = ?",
-      [IDPedido, IDHard, CANTIDAD, id_detalle]
+      "UPDATE detalle_pedidos SET IDHard = ?, CANTIDAD = ? WHERE IDPedido = ?",
+      [IDHard, CANTIDAD, id_pedido]
     );
     return result;
   }
 
-  static async eliminar(id_detalle) {
+  static async modificarCantidad(id_pedido, detalle) {
+    const IDPedido = id_pedido;
+    const { IDHard, CANTIDAD } = detalle;
+
     const [result] = await connection.query(
-      "DELETE FROM detalle_pedidos WHERE id_detalle = ?",
-      [id_detalle]
+      "UPDATE detalle_pedidos SET CANTIDAD = ? WHERE IDPedido = ? AND IDHard = ?",
+      [CANTIDAD, IDPedido, IDHard]
+    );
+    return result;
+  }
+
+  static async eliminar(id_pedido) {
+    const [result] = await connection.query(
+      "DELETE FROM detalle_pedidos WHERE IDPedido = ?",
+      [id_pedido]
     );
     return result.affectedRows > 0;
   }

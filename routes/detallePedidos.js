@@ -8,16 +8,19 @@ export const detallePedidosRouter = Router();
 detallePedidosRouter.get("/", detallePedidosController.getAll);
 
 // Obtener detalle por ID
-detallePedidosRouter.get("/:id_detalle", detallePedidosController.getById);
+detallePedidosRouter.get("/:id_pedido", detallePedidosController.getById);
 
 // Crear nuevo detalle de pedido
 detallePedidosRouter.post("/", detallePedidosController.crear);
 
-// Modificar detalle existente
-detallePedidosRouter.patch("/:id_detalle", detallePedidosController.modificar);
+// Modificar en gral
+detallePedidosRouter.patch("/:id_pedido", detallePedidosController.modificar);
+
+// Modificar por id hard
+detallePedidosRouter.patch("/modificarCantidad/:id_pedido/", detallePedidosController.modificarCantidad);
 
 // Eliminar detalle
-detallePedidosRouter.delete("/:id_detalle", detallePedidosController.eliminar);
+detallePedidosRouter.delete("/:id_pedido", detallePedidosController.eliminar);
 
 // Buscar detalle por campo
 detallePedidosRouter.get(

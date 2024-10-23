@@ -298,9 +298,8 @@ async function finalizarPedido(event) {
       throw new Error("Error al registrar el pedido.");
     }
 
-    const { IDPedido } = await response.json(); // Obtener el ID del pedido creado
+    const { IDPedido } = await response.json();
 
-    // Agregar los detalles al pedido
     for (const detalle of detalles) {
       const detalleResponse = await fetch(
         "http://localhost:3001/detallePedidos",

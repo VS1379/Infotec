@@ -15,8 +15,8 @@ export class detallePedidosController {
 
   static async getById(req, res) {
     try {
-      const { id_detalle } = req.params;
-      const detalle = await detallePedidosModel.getById(id_detalle);
+      const { id_pedido } = req.params;
+      const detalle = await detallePedidosModel.getById(id_pedido);
       if (detalle.length > 0) return res.json(detalle);
       res.status(404).json({ message: "Detalle de pedido no encontrado" });
     } catch (error) {
@@ -51,10 +51,27 @@ export class detallePedidosController {
 
   static async modificar(req, res) {
     try {
-      const { id_detalle } = req.params;
+      const { id_pedido } = req.params;
       const detalle = req.body;
 
-      const result = await detallePedidosModel.modificar(id_detalle, detalle);
+      const result = await detallePedidosModel.modificar(id_pedido, detalle);
+      if (result.affectedRows > 0) return res.json(result);
+      res.status(404).json({ message: "Detalle de pedido no encontrado" });
+    } catch (error) {
+      res
+        .status(500)
+        .json({ message: "Error al modificar el detalle de pedido" });
+    }
+  }
+
+  static async modificarCantidad(req, res) {
+    try {
+      const { id_pedido } = req.params;
+      const detalle = req.body;
+      const result = await detallePedidosModel.modificarCantidad(
+        id_pedido,
+        detalle
+      );
       if (result.affectedRows > 0) return res.json(result);
       res.status(404).json({ message: "Detalle de pedido no encontrado" });
     } catch (error) {
@@ -66,8 +83,8 @@ export class detallePedidosController {
 
   static async eliminar(req, res) {
     try {
-      const { id_detalle } = req.params;
-      const result = await detallePedidosModel.eliminar(id_detalle);
+      const { id_pedido } = req.params;
+      const result = await detallePedidosModel.eliminar(id_pedido);
       if (result) return res.status(204).end();
       res.status(404).json({ message: "Detalle de pedido no encontrado" });
     } catch (error) {
