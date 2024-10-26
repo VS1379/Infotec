@@ -47,7 +47,7 @@
         <br /><br />
 
         <label for="iva">IVA: %</label>
-        <input type="number" id="IVA" required min="0" step="0.01" />
+        <input type="number" id="IVA" required min="0" step="1" />
         <br /><br />
 
         <label for="formaPago">Forma de Pago:</label>
@@ -88,6 +88,27 @@
             </tr>
           </thead>
           <tbody></tbody>
+        </table>
+        <table>
+          <thead>
+            <tr>
+              <th id="montoColumna">
+                MONTO: $
+              </th>
+            </tr>
+          </thead>
+        </table>
+        <table>
+          <thead>
+            <tr>
+              <th id="ivaColumna">
+                IVA: %
+              </th>
+              <th id="montoTotalColumna">
+                MONTO TOTAL: %
+              </th>
+            </tr>
+          </thead>
         </table>
       </fieldset>
       <br />

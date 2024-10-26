@@ -1,6 +1,7 @@
 document.addEventListener("DOMContentLoaded", function () {
   cargarPedidos();
 });
+
 /*
 document.addEventListener("DOMContentLoaded", () => {
   const facturaInput = document.getElementById("numeroFactura");
@@ -67,6 +68,7 @@ function cargarPedidos() {
           const selectedId = event.target.value;
           if (selectedId) {
             cargarDetallesPedido(selectedId);
+
             // Almacenar ID del pedido y del cliente en los hidden inputs
             const selectedOption =
               pedidoSelect.options[pedidoSelect.selectedIndex];
@@ -107,9 +109,14 @@ function cargarDetallesPedido(pedidoId) {
                 const caracteristicasCell = row.insertCell(3);
                 const cantidadCell = row.insertCell(4);
                 const precioCell = row.insertCell(5);
-                //columna precio Total
-                const precioTotal
-                row.insertCell(6);
+
+                const precioTotal = row.insertCell(6);
+                precioTotal.textContent =
+                  parseFloat(item.PRECIO_UNITARIO).toFixed(2) *
+                  detalle.Cantidad;
+
+                console.log(detalle.Cantidad);
+
                 const modificarCell = row.insertCell(7);
                 const eliminarCell = row.insertCell(8);
 
@@ -124,15 +131,16 @@ function cargarDetallesPedido(pedidoId) {
 
                 cantidadCell.textContent = detalle.Cantidad;
 
-                // Crear boton de eliminar
+                // boton eliminar
                 const eliminarBtn = document.createElement("button");
                 eliminarBtn.textContent = "Eliminar";
                 eliminarBtn.onclick = function () {
                   eliminarItem(detalle.IDHard, row);
+                  cargarMontoIvaMontoTotal();
                 };
                 eliminarCell.appendChild(eliminarBtn);
 
-                // Crear boton de modificar
+                // boton modificar
                 const modificarBtn = document.createElement("button");
                 modificarBtn.type = "button";
                 modificarBtn.textContent = "Modificar";
@@ -187,7 +195,9 @@ function cargarDetallesPedido(pedidoId) {
                   };
                 };
                 modificarCell.appendChild(modificarBtn);
+                cargarMontoIvaMontoTotal();
               });
+              cargarMontoIvaMontoTotal();
             } else {
               console.error(
                 "Error: el hardware no es un array o está vacío",
@@ -210,6 +220,35 @@ function eliminarItem(idHard, row) {
   if (confirmacion) {
     row.remove();
   }
+}
+
+function cargarMontoIvaMontoTotal() {
+  let total = 0;
+
+  const tabla = document.getElementById("detallesVenta");
+
+  for (let i = 1; i < tabla.rows.length; i++) {
+    const celda = tabla.rows[i].cells[6];
+
+    if (celda) {
+      const valor = parseFloat(celda.textContent) || 0;
+      total += valor;
+    }
+  }
+
+  document.getElementById("montoColumna").textContent =
+    "MONTO: $" + total.toFixed(0);
+
+  document.getElementById("ivaColumna").textContent =
+    "IVA: %" + (document.getElementById("IVA").value || 0);
+
+  total = parseFloat(total);
+
+  document.getElementById("montoTotalColumna").textContent =
+    "MONTO TOTAL: $" +
+    (
+      ((document.getElementById("IVA").value * total) / 100 || 0) + total
+    ).toFixed(0);
 }
 
 function finalizarVenta() {
