@@ -9,6 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const submitButton = document.getElementById("submitButton");
   facturaInput.addEventListener("blur", async () => {
     const facturaNumber = facturaInput.value;
+    
     messageContainer.textContent = "";
 
     if (facturaNumber) {
@@ -161,9 +162,17 @@ function cargarDetallesPedido(pedidoId) {
                     const nuevaCantidad = parseInt(inputCantidad.value);
                     if (!isNaN(nuevaCantidad) && nuevaCantidad > 0) {
                       cantidadCell.textContent = nuevaCantidad;
-                      console.log(
-                        `Cantidad actualizada para ID_Hard ${inputCantidad.dataset.hardwareId}: ${nuevaCantidad}`
-                      );
+
+                      // Recalcular el precio total de la fila
+                      const precioUnitario = parseFloat(precioCell.textContent);
+                      const nuevoPrecioTotal = (
+                        precioUnitario * nuevaCantidad
+                      ).toFixed(2);
+                      precioTotal.textContent = nuevoPrecioTotal;
+
+                      // Actualizar el total general
+                      cargarMontoIvaMontoTotal();
+
                       try {
                         const response = fetch(
                           `http://localhost:3001/detallePedidos/modificarCantidad/${pedidoId}/`,
@@ -330,7 +339,7 @@ function finalizarVenta() {
       };
 
       // Hacer la solicitud para guardar los detalles de la factura
-      return fetch(`http://localhost:3001/detallesFactura`, {
+      return fetch(`http://localhost:3001/detalleFactura`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -343,9 +352,12 @@ function finalizarVenta() {
     promesas.push(detallesFacturaPromise);
   }
 
+  console.log(pedidoId.value);
+  
+
   // Promesa para cancelar el pedido
   const cancelarPedidoPromise = fetch(
-    `http://localhost:3001/pedidos/cancelar/${pedidoId}`,
+    `http://localhost:3001/pedidos/cancelar/${pedidoId.value}`,
     {
       method: "PUT",
       headers: {
@@ -365,14 +377,14 @@ function finalizarVenta() {
     IDPedido: pedidoId, // Debes tener la variable `pedidoId` definida con el ID del pedido
     Fecha: new Date().toISOString(), // Fecha actual
     MontoTotal: montoTotalFactura.toFixed(2), // Monto total de la factura
-    FormaDePago: document.getElementById("formaDePago").value, // Obtener el método de pago
-    CantidadDeCuotas: document.getElementById("cantidadCuotas").value, // Obtener el número de cuotas
-    PeriodoDeCuotas: document.getElementById("periodoCuotas").value, // Obtener el período de cuotas
+    FormaDePago: document.getElementById("formaPago").value, // Obtener el método de pago
+    CantidadDeCuotas: document.getElementById("cantCuotas").value, // Obtener el número de cuotas
+    PeriodoDeCuotas: document.getElementById("tipoPeriodo").value, // Obtener el período de cuotas
   };
 
   // Hacer la solicitud para guardar la factura
   const guardarFacturaPromise = fetch(
-    `http://localhost:3001/facturas/ventasCrear`,
+    `http://localhost:3001/facturaventas/ventasCrear`,
     {
       method: "POST",
       headers: {
