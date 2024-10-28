@@ -15,8 +15,8 @@ export class ventaModel {
     const [rows] = await connection.query("SELECT * FROM facturas_venta");
     return rows;
   }
+  
   static async crear({
-    numeroFactura,
     IdCliente,
     IdPedido,
     fechaVenta,
@@ -26,11 +26,10 @@ export class ventaModel {
     periodoCuotas,
   }) {
     const query = `
-      INSERT INTO facturas_venta (NroFacv, IDCliente, IDPedido,	Fecha, MontoTotal,	FormaDePago,	CantidadDeCuotas,	PeriodoDeCuotas)
+      INSERT INTO facturas_venta (IDCliente, IDPedido,	Fecha, MontoTotal,	FormaDePago,	CantidadDeCuotas,	PeriodoDeCuotas)
       VALUES (?, ?, ?, ?, ?, ?, ?)
     `;
     await connection.query(query, [
-      numeroFactura,
       IdCliente,
       IdPedido,
       fechaVenta,

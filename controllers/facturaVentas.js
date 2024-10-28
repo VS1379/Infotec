@@ -14,7 +14,6 @@ export const ventaController = {
   async crear(req, res) {
     try {
       const {
-        numeroFactura,
         IdCliente,
         IdPedido,
         fechaVenta,
@@ -23,9 +22,9 @@ export const ventaController = {
         cantCuotas,
         periodoCuotas,
       } = req.body;
-
+      console.log(req.body);
+      
       await ventaModel.crear({
-        numeroFactura,
         IdCliente,
         IdPedido,
         fechaVenta,

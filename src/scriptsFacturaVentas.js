@@ -329,7 +329,7 @@ function finalizarVenta() {
     const detallesFacturaPromise = stockPromise.then(() => {
       // Preparar los datos para los detalles de la factura
       const detallesFactura = {
-        NroFacv: document.getElementById("numeroFactura").value, // Obtenido del input
+        //NroFacv: document.getElementById("numeroFactura").value, // Obtenido del input
         IDHard: idHard,
         PrecioUnitario: precioUnitario,
         Cantidad: cantidad,
@@ -372,7 +372,7 @@ function finalizarVenta() {
 
   // Crear y guardar la factura
   const factura = {
-    NroFacv: document.getElementById("numeroFactura").value, // Número de factura ingresado manualmente
+   // NroFacv: document.getElementById("numeroFactura").value, // Número de factura ingresado manualmente
     IDCliente: idCliente, // ID del cliente extraído del select
     IDPedido: pedidoId, // Debes tener la variable `pedidoId` definida con el ID del pedido
     Fecha: new Date().toISOString(), // Fecha actual
