@@ -15,29 +15,29 @@ export class ventaModel {
     const [rows] = await connection.query("SELECT * FROM facturas_venta");
     return rows;
   }
-  
-  static async crear({
-    IdCliente,
-    IdPedido,
-    fechaVenta,
-    montoTotal,
-    formaPago,
-    cantCuotas,
-    periodoCuotas,
-  }) {
-    const query = `
-      INSERT INTO facturas_venta (IDCliente, IDPedido,	Fecha, MontoTotal,	FormaDePago,	CantidadDeCuotas,	PeriodoDeCuotas)
-      VALUES (?, ?, ?, ?, ?, ?, ?)
-    `;
-    await connection.query(query, [
-      IdCliente,
-      IdPedido,
-      fechaVenta,
-      montoTotal,
-      formaPago,
-      cantCuotas,
-      periodoCuotas,
-    ]);
+
+  static async crear(
+    IDCliente,
+    IDPedido,
+    Fecha,
+    MontoTotal,
+    FormaDePago,
+    CantidadDeCuotas,
+    PeriodoDeCuotas
+  ) {
+    const [result] = await connection.query(
+      "INSERT INTO facturas_venta (IDCliente, IDPedido,	Fecha, MontoTotal,	FormaDePago,	CantidadDeCuotas,	PeriodoDeCuotas) VALUES (?, ?, ?, ?, ?, ?, ?)",
+      [
+        IDCliente,
+        IDPedido,
+        Fecha,
+        MontoTotal,
+        FormaDePago,
+        CantidadDeCuotas,
+        PeriodoDeCuotas,
+      ]
+    );
+    return result;
   }
 
   static async getByNumeroFactura(numeroFactura) {

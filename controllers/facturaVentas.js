@@ -14,25 +14,24 @@ export const ventaController = {
   async crear(req, res) {
     try {
       const {
-        IdCliente,
-        IdPedido,
-        fechaVenta,
-        montoTotal,
-        formaPago,
-        cantCuotas,
-        periodoCuotas,
+        IDCliente,
+        IDPedido,
+        Fecha,
+        MontoTotal,
+        FormaDePago,
+        CantidadDeCuotas,
+        PeriodoDeCuotas,
       } = req.body;
-      console.log(req.body);
-      
-      await ventaModel.crear({
-        IdCliente,
-        IdPedido,
-        fechaVenta,
-        montoTotal,
-        formaPago,
-        cantCuotas,
-        periodoCuotas,
-      });
+
+      await ventaModel.crear(
+        IDCliente,
+        IDPedido,
+        Fecha,
+        MontoTotal,
+        FormaDePago,
+        CantidadDeCuotas,
+        PeriodoDeCuotas
+      );
 
       res.status(201).json({ message: "Venta creada exitosamente" });
     } catch (error) {

@@ -8,7 +8,7 @@ import { tipoHardwareRouter } from "../routes/tipoHarware.js";
 import { pedidosRouter } from "../routes/pedidos.js";
 import { detallePedidosRouter } from "../routes/detallePedidos.js";
 import { ventasRouter } from "../routes/facturaVentas.js";
-import { detalleFacturaRouter } from '../routes/detalleFactura.js'
+import { detalleFacturaRouter } from '../routes/detalleFacturaVenta.js'
 //import validate from '../schemas/clientes/clientes.js'
 import cors from "cors";
 
@@ -27,7 +27,7 @@ app.use("/tipohardware", tipoHardwareRouter);
 app.use("/pedidos", pedidosRouter);
 app.use("/detallePedidos", detallePedidosRouter);
 app.use("/facturaventas", ventasRouter);
-app.use("/detallefactura", detalleFacturaRouter);
+app.use("/detallefacturaventas", detalleFacturaRouter);
 
 const PORT = process.env.PORT ?? 3001;
 

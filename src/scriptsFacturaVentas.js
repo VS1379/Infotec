@@ -15,7 +15,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (facturaNumber) {
       try {
         const response = await fetch(
-          `http://localhost:3001/facturaventa/${facturaNumber}`
+          http://localhost:3001/facturaventa/${facturaNumber}
         );
 
         if (!response.ok) {
@@ -46,9 +46,8 @@ function cargarPedidos() {
       const clientePromises = [];
 
       data.forEach((pedido) => {
-        const clientePromise = fetch(
-          `http://localhost:3001/clientes/${pedido.IDCliente}`
-        )
+        const clientePromise = fetch(`
+          http://localhost:3001/clientes/${pedido.IDCliente}`)
           .then((clienteResponse) => clienteResponse.json())
           .then((clienteData) => {
             const nombreCliente =
@@ -56,6 +55,7 @@ function cargarPedidos() {
             const dniCliente = clienteData?.DNI || "DNI no encontrado";
             const option = document.createElement("option");
             option.value = pedido.IDPedido;
+            option.dataset.clienteId = dniCliente;
             option.textContent = `DNI: ${dniCliente} - Nombre: ${nombreCliente}`;
             pedidoSelect.appendChild(option);
           })
@@ -67,16 +67,16 @@ function cargarPedidos() {
         // Escuchar cambios en el select para cargar detalles del pedido
         pedidoSelect.addEventListener("change", (event) => {
           const selectedId = event.target.value;
+          const selectedOption =
+            pedidoSelect.options[pedidoSelect.selectedIndex];
+          const clienteId = selectedOption.dataset.clienteId;
           if (selectedId) {
             cargarDetallesPedido(selectedId);
-
-            // Almacenar ID del pedido y del cliente en los hidden inputs
             const selectedOption =
               pedidoSelect.options[pedidoSelect.selectedIndex];
             document.getElementById("pedidoId").value = selectedId;
-            // Asumiendo que tienes una manera de obtener el clienteId desde el pedido
             document.getElementById("clienteId").value =
-              selectedOption.dataset.clienteId; // Asegúrate de agregar esta data en la opción si es necesario
+              selectedOption.dataset.clienteId;
           }
         });
       });
@@ -115,8 +115,6 @@ function cargarDetallesPedido(pedidoId) {
                 precioTotal.textContent =
                   parseFloat(item.PRECIO_UNITARIO).toFixed(2) *
                   detalle.Cantidad;
-
-                console.log(detalle.Cantidad);
 
                 const modificarCell = row.insertCell(7);
                 const eliminarCell = row.insertCell(8);
@@ -175,7 +173,8 @@ function cargarDetallesPedido(pedidoId) {
 
                       try {
                         const response = fetch(
-                          `http://localhost:3001/detallePedidos/modificarCantidad/${pedidoId}/`,
+                          `
+                          http://localhost:3001/detallePedidos/modificarCantidad/${pedidoId}/`,
                           {
                             method: "PATCH",
                             headers: {
@@ -260,13 +259,20 @@ function cargarMontoIvaMontoTotal() {
     ).toFixed(0);
 }
 
-function finalizarVenta() {
+async function finalizarVenta() {
   const pedidoSelect = document.getElementById("pedido");
   const idCliente = pedidoSelect.value; // Obtener el ID del cliente desde el select
 
   if (!idCliente) {
     alert("Por favor, seleccione un pedido.");
     return; // Salir de la función si no se seleccionó un pedido
+  }
+
+  // Obtener el nuevo número de factura
+  const nuevoNumeroFactura = await obtenerNuevoNumeroFactura();
+  if (nuevoNumeroFactura === null) {
+    alert("Error al obtener el número de factura.");
+    return;
   }
 
   const iva = parseFloat(document.getElementById("IVA").value) / 100;
@@ -277,6 +283,9 @@ function finalizarVenta() {
 
   // Variable para almacenar el monto total de la factura
   let montoTotalFactura = 0;
+  let stockSuficiente = true; // Bandera para verificar stock
+
+  const detallesFacturaPromise = [];
 
   // Iterar sobre cada fila de la tabla de detalles
   for (let row of detallesTable.rows) {
@@ -314,6 +323,8 @@ function finalizarVenta() {
             body: JSON.stringify(updatedHardware),
           });
         } else {
+          // Si no hay suficiente stock, marcar la bandera como falsa
+          stockSuficiente = false;
           alert(
             `No hay suficiente stock para el hardware ID: ${idHard}. Stock actual: ${stockActual}.`
           );
@@ -325,11 +336,11 @@ function finalizarVenta() {
     // Agregar la promesa de stock al array
     promesas.push(stockPromise);
 
-    // Guardar detalles de la factura
+    // Guardar detalles de la factura solo si hay stock suficiente
     const detallesFacturaPromise = stockPromise.then(() => {
       // Preparar los datos para los detalles de la factura
       const detallesFactura = {
-        //NroFacv: document.getElementById("numeroFactura").value, // Obtenido del input
+        NroFacv: nuevoNumeroFactura,
         IDHard: idHard,
         PrecioUnitario: precioUnitario,
         Cantidad: cantidad,
@@ -337,9 +348,11 @@ function finalizarVenta() {
         IVA: (precioTotal * iva).toFixed(2),
         PrecioIVA: (parseFloat(precioTotal) + precioTotal * iva).toFixed(2),
       };
+      console.log("detalles Factura");
+      console.log(detallesFactura);
 
       // Hacer la solicitud para guardar los detalles de la factura
-      return fetch(`http://localhost:3001/detalleFactura`, {
+      return fetch(`http://localhost:3001/detallefacturaventas`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -352,8 +365,12 @@ function finalizarVenta() {
     promesas.push(detallesFacturaPromise);
   }
 
-  console.log(pedidoId.value);
-  
+  // Verificar si hubo problemas de stock
+  if (!stockSuficiente) {
+    // Cancelar todas las operaciones si no hay suficiente stock
+    alert("La venta ha sido cancelada debido a falta de stock.");
+    return; // Salir de la función
+  }
 
   // Promesa para cancelar el pedido
   const cancelarPedidoPromise = fetch(
@@ -370,17 +387,19 @@ function finalizarVenta() {
   // Agregar la promesa de cancelar pedido al array
   promesas.push(cancelarPedidoPromise);
 
-  // Crear y guardar la factura
   const factura = {
-   // NroFacv: document.getElementById("numeroFactura").value, // Número de factura ingresado manualmente
+    NroFacv: nuevoNumeroFactura, // Número de factura que debe ser +1 del último
     IDCliente: idCliente, // ID del cliente extraído del select
-    IDPedido: pedidoId, // Debes tener la variable `pedidoId` definida con el ID del pedido
+    IDPedido: pedidoId.value, // Debes tener la variable pedidoId definida con el ID del pedido
     Fecha: new Date().toISOString(), // Fecha actual
     MontoTotal: montoTotalFactura.toFixed(2), // Monto total de la factura
     FormaDePago: document.getElementById("formaPago").value, // Obtener el método de pago
     CantidadDeCuotas: document.getElementById("cantCuotas").value, // Obtener el número de cuotas
     PeriodoDeCuotas: document.getElementById("tipoPeriodo").value, // Obtener el período de cuotas
   };
+
+  console.log("factura");
+  console.log(factura);
 
   // Hacer la solicitud para guardar la factura
   const guardarFacturaPromise = fetch(
@@ -401,12 +420,163 @@ function finalizarVenta() {
   Promise.all(promesas)
     .then(() => {
       alert("Venta finalizada exitosamente!");
+      obtenerYImprimirComprobante(factura, detallesFacturaPromise);
       limpiarFormulario();
     })
     .catch((error) => {
       console.error("Error al finalizar la venta:", error);
       alert("Hubo un error al finalizar la venta. Verifica los detalles.");
     });
+}
+
+async function obtenerYImprimirComprobante(factura, detallesProductos) {
+  const clienteId = document.getElementById("clienteId").value;
+
+  try {
+    const response = await fetch(`http://localhost:3001/clientes/${clienteId}`);
+    if (!response.ok) {
+      throw new Error("Cliente no encontrado");
+    }
+
+    const detallesCliente = await response.json();
+
+    // Llamar a imprimirComprobante con la información completa
+    imprimirComprobante(factura, detallesCliente, detallesProductos);
+  } catch (error) {
+    console.error("Error al obtener los detalles del cliente:", error);
+    alert("No se pudo obtener la información del cliente.");
+  }
+}
+
+function imprimirComprobante(factura, detallesCliente, detallesProductos) {
+  const comprobanteHtml = `
+    <html>
+    <head>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                color: #333;
+                margin: 0;
+                padding: 0;
+                background-color: #f9f9f9;
+            }
+            .comprobante {
+                max-width: 800px;
+                margin: 20px auto;
+                padding: 20px;
+                background-color: #fff;
+                border: 1px solid #ddd;
+                border-radius: 5px;
+            }
+            h1, h2 {
+                color: #0073e6;
+            }
+            .detalles-cliente, .detalles-pedido {
+                margin-bottom: 20px;
+            }
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-bottom: 20px;
+            }
+            th, td {
+                padding: 10px;
+                border: 1px solid #ddd;
+                text-align: left;
+            }
+            th {
+                background-color: #f2f2f2;
+                font-weight: bold;
+            }
+            .total {
+                font-size: 1.2em;
+                font-weight: bold;
+                text-align: right;
+                margin-top: 10px;
+            }
+            .footer {
+                text-align: center;
+                margin-top: 30px;
+                font-size: 0.9em;
+                color: #777;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="comprobante">
+            <h1>Comprobante de Pedido</h1>
+            <div class="detalles-cliente">
+                <h2>Detalles del Cliente</h2>
+                <p><strong>DNI:</strong> ${detallesCliente.DNI}</p>
+                <p><strong>Nombre:</strong> ${detallesCliente.NOMBRE} (ID: ${detallesCliente.ID_Cliente})</p>
+                <p><strong>Dirección:</strong> ${detallesCliente.DIRECCION}</p>
+                <p><strong>Teléfono:</strong> ${detallesCliente.TELEFONO}</p>
+                <p><strong>Correo:</strong> ${detallesCliente.CORREO}</p>
+            </div>
+            <div class="detalles-pedido">
+                <h2>Detalles del Pedido</h2>
+                <p><strong>Fecha del Pedido:</strong> ${new Date(factura.Fecha).toLocaleDateString()}</p>
+                <p><strong>Tipo de Pedido:</strong> ${factura.Tipo}</p>
+            </div>
+            <h2>Detalles del Producto</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Tipo</th>
+                        <th>Marca</th>
+                        <th>Características</th>
+                        <th>Precio Unitario</th>
+                        <th>Cantidad</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${generarDetallesProductosHtml(detallesProductos)}
+                </tbody>
+            </table>
+            <p class="total">Monto Total con IVA: $${factura.MontoTotal}</p>
+            <div class="footer">
+                <p>¡Gracias por su compra!</p>
+            </div>
+        </div>
+    </body>
+    </html>
+  `;
+
+  const ventana = window.open("", "_blank");
+  ventana.document.write(comprobanteHtml);
+  ventana.document.close();
+  ventana.print();
+}
+
+function generarDetallesProductosHtml(detalles) {
+  return detalles
+    .map(
+      (detalle) => `
+        <tr>
+            <td>${detalle.tipo}</td>
+            <td>${detalle.marca}</td>
+            <td>${detalle.caracteristicas}</td>
+            <td>$${detalle.precioUnitario}</td>
+            <td>${detalle.cantidad}</td>
+            <td>${detalle.estado}</td>
+        </tr>
+      `
+    )
+    .join("");
+}
+
+
+async function obtenerNuevoNumeroFactura() {
+  try {
+    const response = await fetch("http://localhost:3001/facturaventas");
+    const facturas = await response.json();
+    const ultimoIdFactura = facturas[facturas.length - 1]?.NroFacv || 0;
+    return ultimoIdFactura + 1;
+  } catch (error) {
+    console.error("Error al obtener el número de factura:", error);
+    return null;
+  }
 }
 
 // Función para limpiar el formulario

@@ -1,4 +1,4 @@
-import { detalleFacturaModel } from "../models/mysql/detalleFactura.js";
+import { detalleFacturaModel } from "../models/mysql/detalleFacturaVenta.js";
 
 export class detalleFacturaController {
   static async getAll(req, res) {

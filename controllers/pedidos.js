@@ -59,7 +59,6 @@ export class pedidoController {
   static async cancelar(req, res) {
     try {
       const { numeroPedido } = req.params;
-      console.log(req.body);
 
       const pedido = await pedidoModel.getById(numeroPedido);
       console.log(pedido);
