@@ -53,8 +53,6 @@ export class hardwareModel {
     const { PRECIO_UNITARIO: precio_unitario } = hardware;
     const { UNIDADES_DISPONIBLES: unidades_disponibles } = hardware;
 
-    console.log(hardware);
-
     const [result] = await connection.query(
       "UPDATE hardware SET id_tipohard = ?, id_marca = ?, caracteristicas = ?, precio_unitario = ?, unidades_disponibles = ? WHERE id_hard = ?",
       [

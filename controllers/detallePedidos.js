@@ -30,8 +30,6 @@ export class detallePedidosController {
     try {
       const { IDPedido, IDHard, CANTIDAD } = req.body;
 
-      //console.log(req.body);
-
       if (!IDPedido || !IDHard || CANTIDAD <= 0) {
         return res
           .status(400)

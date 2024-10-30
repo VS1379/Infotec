@@ -61,7 +61,6 @@ export class pedidoController {
       const { numeroPedido } = req.params;
 
       const pedido = await pedidoModel.getById(numeroPedido);
-      console.log(pedido);
       
       if (!pedido || pedido.condicion === 1) {
         return res

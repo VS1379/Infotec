@@ -18,7 +18,6 @@ export class socioModel {
 
     static async getById(dni) {
         const [rows] = await connection.query('SELECT * FROM socios WHERE DNI = ?', [dni]);
-        console.log(rows);
         
         return rows[0];
     }

@@ -394,7 +394,6 @@ document.addEventListener("DOMContentLoaded", () => {
           .then(async (data) => {
             document.getElementById("dontExist").innerHTML = "";
             const updateForm = document.getElementById(updateFormId);
-            console.log(updateForm);
 
             if (updateForm) {
               updateForm.hidden = false; // Mostrar el formulario de actualización
@@ -403,7 +402,6 @@ document.addEventListener("DOMContentLoaded", () => {
             if (updateIdField) {
               updateIdField.readOnly = true; // Bloquear el campo de ID
             }
-            console.log(updateForm);
             // Cargar marcas y tipos de hardware
             await cargarMarcasYTipos(
               "marcaSelectUpdate",

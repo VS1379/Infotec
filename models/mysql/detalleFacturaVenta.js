@@ -27,15 +27,6 @@ export class detalleFacturaModel {
   }
 
   static async crear(detalle) {
-    console.log(
-      detalle.NroFacv,
-      detalle.IDHard,
-      detalle.PrecioUnitario,
-      detalle.Cantidad,
-      detalle.PrecioTotal,
-      detalle.IVA,
-      detalle.PrecioIVA
-    );
 
     const [result] = await connection.query(
       "INSERT INTO detalle_facturas_venta (NroFacv, IDHard, PrecioUnitario, Cantidad, PrecioTotal, IVA, PrecioIVA) VALUES (?, ?, ?, ?, ?, ?, ?)",

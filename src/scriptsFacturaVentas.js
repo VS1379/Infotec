@@ -275,27 +275,27 @@ async function finalizarVenta() {
     return;
   }
 
-  const iva = parseFloat(document.getElementById("IVA").value) / 100;
+  let iva = parseFloat(document.getElementById("IVA").value) / 100;
+
   const detallesTable = document
     .getElementById("detallesVenta")
     .querySelector("tbody");
   const promesas = []; // Array para almacenar todas las promesas
 
-  // Variable para almacenar el monto total de la factura
   let montoTotalFactura = 0;
   let stockSuficiente = true; // Bandera para verificar stock
 
-  const detallesFacturaPromise = [];
+  const detallesFacturaArray = [];
 
   // Iterar sobre cada fila de la tabla de detalles
   for (let row of detallesTable.rows) {
     const idHard = row.getAttribute("data-id");
     const cantidad = parseInt(row.cells[4].textContent);
     const precioUnitario = parseFloat(row.cells[5].textContent);
-    const precioTotal = (precioUnitario * cantidad * (1 + iva)).toFixed(2); // Calcular el precio total
+    const precioTotal = precioUnitario * cantidad; // Calcular el precio total
 
     // Acumular el monto total de la factura
-    montoTotalFactura += parseFloat(precioTotal);
+    montoTotalFactura += parseFloat(precioTotal.toFixed(2));
 
     // Verificar stock y actualizar hardware
     const stockPromise = fetch(`http://localhost:3001/hardware/${idHard}`)
@@ -339,17 +339,19 @@ async function finalizarVenta() {
     // Guardar detalles de la factura solo si hay stock suficiente
     const detallesFacturaPromise = stockPromise.then(() => {
       // Preparar los datos para los detalles de la factura
+      iva = iva * 100;
       const detallesFactura = {
         NroFacv: nuevoNumeroFactura,
         IDHard: idHard,
         PrecioUnitario: precioUnitario,
         Cantidad: cantidad,
         PrecioTotal: precioTotal,
-        IVA: (precioTotal * iva).toFixed(2),
+        IVA: iva.toFixed(4),
         PrecioIVA: (parseFloat(precioTotal) + precioTotal * iva).toFixed(2),
       };
-      console.log("detalles Factura");
-      console.log(detallesFactura);
+      iva = iva / 100;
+
+      detallesFacturaArray.push(detallesFactura);
 
       // Hacer la solicitud para guardar los detalles de la factura
       return fetch(`http://localhost:3001/detallefacturaventas`, {
@@ -387,6 +389,7 @@ async function finalizarVenta() {
   // Agregar la promesa de cancelar pedido al array
   promesas.push(cancelarPedidoPromise);
 
+  montoTotalFactura = montoTotalFactura * (1 + iva);
   const factura = {
     NroFacv: nuevoNumeroFactura, // Número de factura que debe ser +1 del último
     IDCliente: idCliente, // ID del cliente extraído del select
@@ -397,9 +400,6 @@ async function finalizarVenta() {
     CantidadDeCuotas: document.getElementById("cantCuotas").value, // Obtener el número de cuotas
     PeriodoDeCuotas: document.getElementById("tipoPeriodo").value, // Obtener el período de cuotas
   };
-
-  console.log("factura");
-  console.log(factura);
 
   // Hacer la solicitud para guardar la factura
   const guardarFacturaPromise = fetch(
@@ -420,7 +420,7 @@ async function finalizarVenta() {
   Promise.all(promesas)
     .then(() => {
       alert("Venta finalizada exitosamente!");
-      obtenerYImprimirComprobante(factura, detallesFacturaPromise);
+      obtenerYImprimirComprobante(factura, detallesFacturaArray);
       limpiarFormulario();
     })
     .catch((error) => {
@@ -429,7 +429,7 @@ async function finalizarVenta() {
     });
 }
 
-async function obtenerYImprimirComprobante(factura, detallesProductos) {
+async function obtenerYImprimirComprobante(factura, detallesFactura) {
   const clienteId = document.getElementById("clienteId").value;
 
   try {
@@ -441,100 +441,82 @@ async function obtenerYImprimirComprobante(factura, detallesProductos) {
     const detallesCliente = await response.json();
 
     // Llamar a imprimirComprobante con la información completa
-    imprimirComprobante(factura, detallesCliente, detallesProductos);
+    imprimirComprobante(factura, detallesCliente, detallesFactura);
   } catch (error) {
     console.error("Error al obtener los detalles del cliente:", error);
     alert("No se pudo obtener la información del cliente.");
   }
 }
 
-function imprimirComprobante(factura, detallesCliente, detallesProductos) {
+async function imprimirComprobante(factura, detallesCliente, detallesFactura) {
+  // Convertir la forma de pago en texto
+  factura.FormaDePago =
+    ["", "Efectivo", "Tarjeta", "Cheque", "Cuotas"][factura.FormaDePago] ||
+    "Desconocido";
+
+  // Esperar el resultado de obtenerDetallesProductos para generar los detalles del producto
+  const detallesProductosHtml = await obtenerDetallesProductos(detallesFactura);
+  let iva = detallesFactura[0].IVA;
+  detallesFactura[0].IVA = detallesFactura[0].IVA / 100;
+  detallesFactura[0].IVA = detallesFactura[0].IVA + 1;
   const comprobanteHtml = `
     <html>
     <head>
         <style>
-            body {
-                font-family: Arial, sans-serif;
-                color: #333;
-                margin: 0;
-                padding: 0;
-                background-color: #f9f9f9;
-            }
-            .comprobante {
-                max-width: 800px;
-                margin: 20px auto;
-                padding: 20px;
-                background-color: #fff;
-                border: 1px solid #ddd;
-                border-radius: 5px;
-            }
-            h1, h2 {
-                color: #0073e6;
-            }
-            .detalles-cliente, .detalles-pedido {
-                margin-bottom: 20px;
-            }
-            table {
-                width: 100%;
-                border-collapse: collapse;
-                margin-bottom: 20px;
-            }
-            th, td {
-                padding: 10px;
-                border: 1px solid #ddd;
-                text-align: left;
-            }
-            th {
-                background-color: #f2f2f2;
-                font-weight: bold;
-            }
-            .total {
-                font-size: 1.2em;
-                font-weight: bold;
-                text-align: right;
-                margin-top: 10px;
-            }
-            .footer {
-                text-align: center;
-                margin-top: 30px;
-                font-size: 0.9em;
-                color: #777;
-            }
+            body { font-family: Arial, sans-serif; color: #333; margin: 0; padding: 0; background-color: #f9f9f9; }
+            .comprobante { max-width: 800px; margin: 20px auto; padding: 20px; background-color: #fff; border: 1px solid #ddd; border-radius: 5px; }
+            h1, h2 { color: #0073e6; }
+            .detalles-cliente, .detalles-pedido { margin-bottom: 20px; }
+            table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+            th, td { padding: 10px; border: 1px solid #ddd; text-align: left; }
+            th { background-color: #f2f2f2; font-weight: bold; }
+            .total { font-size: 1.2em; font-weight: bold; text-align: right; margin-top: 10px; }
+            .footer { text-align: center; margin-top: 30px; font-size: 0.9em; color: #777; }
         </style>
     </head>
     <body>
         <div class="comprobante">
-            <h1>Comprobante de Pedido</h1>
+            <h1>FACTURA</h1>
             <div class="detalles-cliente">
                 <h2>Detalles del Cliente</h2>
                 <p><strong>DNI:</strong> ${detallesCliente.DNI}</p>
-                <p><strong>Nombre:</strong> ${detallesCliente.NOMBRE} (ID: ${detallesCliente.ID_Cliente})</p>
+                <p><strong>Nombre:</strong> ${detallesCliente.NOMBRE}</p>
                 <p><strong>Dirección:</strong> ${detallesCliente.DIRECCION}</p>
                 <p><strong>Teléfono:</strong> ${detallesCliente.TELEFONO}</p>
                 <p><strong>Correo:</strong> ${detallesCliente.CORREO}</p>
             </div>
             <div class="detalles-pedido">
                 <h2>Detalles del Pedido</h2>
-                <p><strong>Fecha del Pedido:</strong> ${new Date(factura.Fecha).toLocaleDateString()}</p>
-                <p><strong>Tipo de Pedido:</strong> ${factura.Tipo}</p>
+                <p><strong>Fecha del Pedido:</strong> ${new Date(
+                  factura.Fecha
+                ).toLocaleDateString()}</p>
+                <p><strong>Forma de Pago:</strong> ${factura.FormaDePago}</p>
+                <p><strong>Cantidad de Cuotas / Cheques:</strong> ${
+                  factura.CantidadDeCuotas
+                }</p>
             </div>
             <h2>Detalles del Producto</h2>
             <table>
                 <thead>
                     <tr>
-                        <th>Tipo</th>
-                        <th>Marca</th>
-                        <th>Características</th>
-                        <th>Precio Unitario</th>
+                        <th>Item N°</th>
+                        <th>Detalle</th>
                         <th>Cantidad</th>
-                        <th>Estado</th>
+                        <th>Precio Unitario</th>
+                        <th>Precio Total</th>
                     </tr>
                 </thead>
                 <tbody>
-                    ${generarDetallesProductosHtml(detallesProductos)}
+                    ${detallesProductosHtml}
                 </tbody>
             </table>
-            <p class="total">Monto Total con IVA: $${factura.MontoTotal}</p>
+            <p class="total">IVA: % ${parseFloat(iva).toFixed(2)}</p>   
+            <p class="total">Monto: $${parseFloat(
+              factura.MontoTotal / detallesFactura[0].IVA
+            ).toFixed(2)}</p>
+            <p class="total">Monto Total + IVA: $${parseFloat(
+              factura.MontoTotal
+            ).toFixed(2)}</p>
             <div class="footer">
                 <p>¡Gracias por su compra!</p>
             </div>
@@ -549,23 +531,54 @@ function imprimirComprobante(factura, detallesCliente, detallesProductos) {
   ventana.print();
 }
 
+async function obtenerDetallesProductos(detalles) {
+  const detallesCompletos = await Promise.all(
+    detalles.map(async (detalle) => {
+      const respuestaHardware = await fetch(
+        `http://localhost:3001/hardware/${detalle.IDHard}`
+      );
+      const [hardware] = await respuestaHardware.json();
+
+      const respuestaTipo = await fetch(
+        `http://localhost:3001/tipohardware/${hardware.ID_Tipohard}`
+      );
+      const [tipoHard] = await respuestaTipo.json();
+
+      const respuestaMarca = await fetch(
+        `http://localhost:3001/marca/${hardware.ID_Marca}`
+      );
+      const [marca] = await respuestaMarca.json();
+
+      return {
+        tipo: tipoHard.DESCRIPCION,
+        marca: marca.DESCRIPCION,
+        caracteristicas: hardware.CARACTERISTICAS,
+        precioUnitario: detalle.PrecioUnitario,
+        cantidad: detalle.Cantidad,
+        PrecioTotal: detalle.PrecioTotal,
+      };
+    })
+  );
+
+  return generarDetallesProductosHtml(detallesCompletos);
+}
+
 function generarDetallesProductosHtml(detalles) {
+  let nro = 0;
   return detalles
     .map(
       (detalle) => `
-        <tr>
-            <td>${detalle.tipo}</td>
-            <td>${detalle.marca}</td>
-            <td>${detalle.caracteristicas}</td>
-            <td>$${detalle.precioUnitario}</td>
-            <td>${detalle.cantidad}</td>
-            <td>${detalle.estado}</td>
-        </tr>
-      `
+      <tr>
+        <td>${++nro}</td>
+        <td>${detalle.tipo}, ${detalle.marca}, ${detalle.caracteristicas}</td>
+        <td>${detalle.cantidad}</td>
+        <td>$${parseFloat(detalle.precioUnitario).toFixed(2)}</td>
+        <td>$${parseFloat(detalle.PrecioTotal).toFixed(2)}</td>
+      </tr>
+    `
     )
     .join("");
 }
-
 
 async function obtenerNuevoNumeroFactura() {
   try {
@@ -581,13 +594,5 @@ async function obtenerNuevoNumeroFactura() {
 
 // Función para limpiar el formulario
 function limpiarFormulario() {
-  document.getElementById("pedidoId").value = "";
-  document.getElementById("IVA").value = "";
-  document.getElementById("numeroFactura").value = "";
-  document.getElementById("cantCuotas").value = "";
-
-  const detallesTable = document
-    .getElementById("detallesVenta")
-    .querySelector("tbody");
-  detallesTable.innerHTML = "";
+  //location.reload();
 }

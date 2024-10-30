@@ -26,7 +26,6 @@ export class tipoHardwareModel {
 
   static async crear(tipo) {
     const { descripcionTipoHardware: descripcion } = tipo;
-    console.log(descripcion);
     const [result] = await connection.query(
       "INSERT INTO tipo_hardware (descripcion) VALUES (?)",
       [descripcion]

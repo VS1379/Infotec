@@ -148,17 +148,12 @@ async function cargarHardwarePorTipoYMarca() {
     // Actualizar el campo oculto cuando el usuario cambie la selección
     selectElement.addEventListener("change", () => {
       idHardwareSeleccionado.value = selectElement.value;
-      console.log(
-        "ID del hardware seleccionado:",
-        idHardwareSeleccionado.value
-      );
     });
 
     // Si hay al menos un hardware disponible, seleccionar el primero automáticamente
     if (hardwareFiltrado.length > 0) {
       selectElement.selectedIndex = 0;
       idHardwareSeleccionado.value = selectElement.value;
-      console.log("ID del hardware inicial:", idHardwareSeleccionado.value);
     }
   } catch (error) {
     console.error("Error al cargar el hardware filtrado:", error);
@@ -418,10 +413,10 @@ function agregarDetalle() {
   const idHardware = hardwareSelect.value;
   const hardwareCaracteristicas = hardwareSelect.selectedOptions[0].textContent;
 
-  const partes = hardwareCaracteristicas.split(" - $")[1]
-  const precio = partes[0]
+  const partes = hardwareCaracteristicas.split(" - $")[1];
+  const precio = partes[0];
   const cantidad = document.getElementById("cantidad").value;
-  const stock = partes[1]
+  const stock = partes[1];
   const estado = stock >= cantidad ? "Disponible" : "Sin stock";
 
   if (!idHardware || cantidad === "" || cantidad <= 0) {
