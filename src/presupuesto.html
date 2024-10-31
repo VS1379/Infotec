@@ -38,7 +38,7 @@
         <input type="hidden" id="clienteId" value="" />
         <br /><br />
 
-        <label for="fechaVenta">Fecha de Venta:</label>
+        <label for="fechaVenta">Valido Hasta  :</label>
         <input type="datetime-local" id="fechaVenta" required />
         <br /><br />
 
@@ -60,16 +60,11 @@
         <input type="number" id="cantCuotas" required min="0" step="1" />
         <br /><br />
 
-        <label for="tipoPeriodo">Tipo de Período:</label>
-        <select id="tipoPeriodo" required>
-          <option value="mensual">Mensual</option>
-          <option value="semanal">Semanal</option>
-        </select>
       </fieldset>
       <br />
       <fieldset>
-        <legend>Detalles del Hardware Vendido</legend>
-        <table id="detallesVenta">
+        <legend>Detalles del Hardware Presupuestado</legend>
+        <table id="detallesPresupuesto">
           <thead>
             <tr>
               <th>Item Nro</th>
@@ -79,8 +74,6 @@
               <th>Cantidad</th>
               <th>Precio Unitario</th>
               <th>Precio Total</th>
-              <th></th>
-              <th></th>
             </tr>
           </thead>
           <tbody></tbody>
@@ -103,11 +96,11 @@
       </fieldset>
       <br />
 
-      <button type="button" onclick="finalizarVenta()">Finalizar Venta</button>
+      <button type="button" onclick="imprimirPresupuesto()">Finalizar Presupuesto</button>
     </form>
     <br />
     <a href="index.html">Volver al inicio</a>
     <br />
-    <script src="scriptsFacturaVentas.js"></script>
+    <script src="scriptsPresupuesto.js"></script>
   </body>
 </html>
