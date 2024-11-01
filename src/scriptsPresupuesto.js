@@ -78,7 +78,10 @@ function cargarDetallesPedido(pedidoId) {
                 const precioTotal = row.insertCell(6);
                 precioTotal.textContent =
                   parseFloat(item.PRECIO_UNITARIO).toFixed(2) *
-                  detalle.Cantidad;
+                  detalle.Cantidad.toFixed(2);
+                precioTotal.textContent = parseFloat(
+                  precioTotal.textContent
+                ).toFixed(2);
 
                 const modificarCell = row.insertCell(7);
                 const eliminarCell = row.insertCell(8);
@@ -258,7 +261,7 @@ async function imprimirPresupuesto() {
           // Si no hay suficiente stock, marcar la bandera como falsa
           stockSuficiente = false;
           alert(
-            `No hay suficiente stock para el hardware ID: ${idHard}. Stock actual: ${stockActual}.`
+            `¡ Advertencia ! \n No hay suficiente stock para el hardware ID: ${idHard}. Stock actual: ${stockActual}.`
           );
           throw new Error(`Stock insuficiente para ID: ${idHard}`); // Lanza un error si no hay suficiente stock
         }
@@ -292,7 +295,7 @@ async function imprimirPresupuesto() {
     NroFacv: 0, // Número de factura que debe ser +1 del último
     IDCliente: idCliente, // ID del cliente extraído del select
     IDPedido: pedidoId.value, // Debes tener la variable pedidoId definida con el ID del pedido
-    Fecha: new Date().toISOString(), // Fecha actual
+    Fecha: document.getElementById("fechaVenta").value, // Fecha actual
     MontoTotal: montoTotalFactura.toFixed(2), // Monto total de la factura
     FormaDePago: document.getElementById("formaPago").value, // Obtener el método de pago
     CantidadDeCuotas: document.getElementById("cantCuotas").value, // Obtener el número de cuotas
@@ -300,7 +303,7 @@ async function imprimirPresupuesto() {
 
   // Esperar a que todas las promesas se completen
 
-  alert("Venta finalizada exitosamente!");
+  alert("Presupuesto Finalizado Exitosamente!");
   obtenerYImprimirComprobante(factura, detallesFacturaArray);
   limpiarFormulario();
 }
@@ -325,10 +328,17 @@ async function obtenerYImprimirComprobante(factura, detallesFactura) {
 }
 
 async function imprimirComprobante(factura, detallesCliente, detallesFactura) {
+  console.log(factura);
+
   // Convertir la forma de pago en texto
   factura.FormaDePago =
     ["", "Efectivo", "Tarjeta", "Cheque", "Cuotas"][factura.FormaDePago] ||
-    "Desconocido";
+    "Otra";
+
+  factura.Fecha =
+    factura.Fecha === ""
+      ? "Sin Vencimiento"
+      : new Date(factura.Fecha).toLocaleDateString();
 
   // Esperar el resultado de obtenerDetallesProductos para generar los detalles del producto
   const detallesProductosHtml = await obtenerDetallesProductos(detallesFactura);
@@ -363,12 +373,10 @@ async function imprimirComprobante(factura, detallesCliente, detallesFactura) {
             </div>
             <div class="detalles-pedido">
                 <h2>Detalles del Pedido</h2>
-                <p><strong>Fecha del Pedido:</strong> ${new Date(
-                  factura.Fecha
-                ).toLocaleDateString()}</p>
+                <p><strong>Valido Hasta:</strong> ${factura.Fecha}</p>
                 <p><strong>Forma de Pago:</strong> ${factura.FormaDePago}</p>
                 <p><strong>Cantidad de Cuotas / Cheques:</strong> ${
-                  factura.CantidadDeCuotas
+                  factura.CantidadDeCuotas || 0
                 }</p>
             </div>
             <h2>Detalles del Producto</h2>
