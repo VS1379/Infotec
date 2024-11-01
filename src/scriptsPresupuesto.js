@@ -54,7 +54,7 @@ function cargarDetallesPedido(pedidoId) {
     .then((detalles) => {
       let i = 0;
       const grillaHardware = document
-        .getElementById("detallesVenta")
+        .getElementById("detallesPresupuesto")
         .querySelector("tbody");
       grillaHardware.innerHTML = "";
 
@@ -134,25 +134,6 @@ function cargarDetallesPedido(pedidoId) {
 
                       // Actualizar el total general
                       cargarMontoIvaMontoTotal();
-
-                      try {
-                        const response = fetch(
-                          `
-                          http://localhost:3001/detallePedidos/modificarCantidad/${pedidoId}/`,
-                          {
-                            method: "PATCH",
-                            headers: {
-                              "Content-Type": "application/json",
-                            },
-                            body: JSON.stringify({
-                              IDHard: detalle.IDHard,
-                              CANTIDAD: nuevaCantidad,
-                            }),
-                          }
-                        );
-                      } catch (error) {
-                        console.error(error);
-                      }
                     } else {
                       cantidadCell.textContent = detalle.Cantidad;
                     }
@@ -197,7 +178,7 @@ function eliminarItem(idHard, row) {
 function cargarMontoIvaMontoTotal() {
   let total = 0;
 
-  const tabla = document.getElementById("detallesVenta");
+  const tabla = document.getElementById("detallesPresupuesto");
 
   for (let i = 1; i < tabla.rows.length; i++) {
     const celda = tabla.rows[i].cells[6];
@@ -223,7 +204,7 @@ function cargarMontoIvaMontoTotal() {
     ).toFixed(0);
 }
 
-async function finalizarVenta() {
+async function imprimirPresupuesto() {
   const pedidoSelect = document.getElementById("pedido");
   const idCliente = pedidoSelect.value; // Obtener el ID del cliente desde el select
 
@@ -233,16 +214,12 @@ async function finalizarVenta() {
   }
 
   // Obtener el nuevo número de factura
-  const nuevoNumeroFactura = await obtenerNuevoNumeroFactura();
-  if (nuevoNumeroFactura === null) {
-    alert("Error al obtener el número de factura.");
-    return;
-  }
+  const numeroPedido = document.getElementById("pedidoId").value;
 
   let iva = parseFloat(document.getElementById("IVA").value) / 100;
 
   const detallesTable = document
-    .getElementById("detallesVenta")
+    .getElementById("detallesPresupuesto")
     .querySelector("tbody");
   const promesas = []; // Array para almacenar todas las promesas
 
@@ -277,15 +254,6 @@ async function finalizarVenta() {
             PRECIO_UNITARIO: hardware[0].PRECIO_UNITARIO,
             UNIDADES_DISPONIBLES: stockActual - cantidad, // Restar cantidad al stock
           };
-
-          // Actualizar unidades disponibles en el hardware
-          return fetch(`http://localhost:3001/hardware/${idHard}`, {
-            method: "PATCH",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(updatedHardware),
-          });
         } else {
           // Si no hay suficiente stock, marcar la bandera como falsa
           stockSuficiente = false;
@@ -297,38 +265,19 @@ async function finalizarVenta() {
       })
       .catch((error) => console.error("Error al verificar stock:", error));
 
-    // Agregar la promesa de stock al array
-    promesas.push(stockPromise);
+    // Guardar detalles del presupuesto solo si hay stock suficiente
+    iva = iva * 100;
+    const detallesFactura = {
+      IDHard: idHard,
+      PrecioUnitario: precioUnitario,
+      Cantidad: cantidad,
+      PrecioTotal: precioTotal,
+      IVA: iva.toFixed(4),
+      PrecioIVA: (parseFloat(precioTotal) + precioTotal * iva).toFixed(2),
+    };
+    iva = iva / 100;
 
-    // Guardar detalles de la factura solo si hay stock suficiente
-    const detallesFacturaPromise = stockPromise.then(() => {
-      // Preparar los datos para los detalles de la factura
-      iva = iva * 100;
-      const detallesFactura = {
-        NroFacv: nuevoNumeroFactura,
-        IDHard: idHard,
-        PrecioUnitario: precioUnitario,
-        Cantidad: cantidad,
-        PrecioTotal: precioTotal,
-        IVA: iva.toFixed(4),
-        PrecioIVA: (parseFloat(precioTotal) + precioTotal * iva).toFixed(2),
-      };
-      iva = iva / 100;
-
-      detallesFacturaArray.push(detallesFactura);
-
-      // Hacer la solicitud para guardar los detalles de la factura
-      return fetch(`http://localhost:3001/detallefacturaventas`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(detallesFactura),
-      });
-    });
-
-    // Agregar la promesa de detalles de factura al array
-    promesas.push(detallesFacturaPromise);
+    detallesFacturaArray.push(detallesFactura);
   }
 
   // Verificar si hubo problemas de stock
@@ -338,59 +287,22 @@ async function finalizarVenta() {
     return; // Salir de la función
   }
 
-  // Promesa para cancelar el pedido
-  const cancelarPedidoPromise = fetch(
-    `http://localhost:3001/pedidos/cancelar/${pedidoId.value}`,
-    {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ condicion: 2 }),
-    }
-  );
-
-  // Agregar la promesa de cancelar pedido al array
-  promesas.push(cancelarPedidoPromise);
-
   montoTotalFactura = montoTotalFactura * (1 + iva);
   const factura = {
-    NroFacv: nuevoNumeroFactura, // Número de factura que debe ser +1 del último
+    NroFacv: 0, // Número de factura que debe ser +1 del último
     IDCliente: idCliente, // ID del cliente extraído del select
     IDPedido: pedidoId.value, // Debes tener la variable pedidoId definida con el ID del pedido
     Fecha: new Date().toISOString(), // Fecha actual
     MontoTotal: montoTotalFactura.toFixed(2), // Monto total de la factura
     FormaDePago: document.getElementById("formaPago").value, // Obtener el método de pago
     CantidadDeCuotas: document.getElementById("cantCuotas").value, // Obtener el número de cuotas
-    PeriodoDeCuotas: document.getElementById("tipoPeriodo").value, // Obtener el período de cuotas
   };
 
-  // Hacer la solicitud para guardar la factura
-  const guardarFacturaPromise = fetch(
-    `http://localhost:3001/facturaventas/ventasCrear`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(factura),
-    }
-  );
-
-  // Agregar la promesa de guardar factura al array
-  promesas.push(guardarFacturaPromise);
-
   // Esperar a que todas las promesas se completen
-  Promise.all(promesas)
-    .then(() => {
-      alert("Venta finalizada exitosamente!");
-      obtenerYImprimirComprobante(factura, detallesFacturaArray);
-      limpiarFormulario();
-    })
-    .catch((error) => {
-      console.error("Error al finalizar la venta:", error);
-      alert("Hubo un error al finalizar la venta. Verifica los detalles.");
-    });
+
+  alert("Venta finalizada exitosamente!");
+  obtenerYImprimirComprobante(factura, detallesFacturaArray);
+  limpiarFormulario();
 }
 
 async function obtenerYImprimirComprobante(factura, detallesFactura) {
@@ -440,7 +352,7 @@ async function imprimirComprobante(factura, detallesCliente, detallesFactura) {
     </head>
     <body>
         <div class="comprobante">
-            <h1>FACTURA</h1>
+            <h1>PRESUPUESTO</h1>
             <div class="detalles-cliente">
                 <h2>Detalles del Cliente</h2>
                 <p><strong>DNI:</strong> ${detallesCliente.DNI}</p>
@@ -482,7 +394,7 @@ async function imprimirComprobante(factura, detallesCliente, detallesFactura) {
               factura.MontoTotal
             ).toFixed(2)}</p>
             <div class="footer">
-                <p>¡Gracias por su compra!</p>
+                <p>¡Gracias por tenernos en cuenta!</p>
             </div>
         </div>
     </body>
@@ -544,12 +456,13 @@ function generarDetallesProductosHtml(detalles) {
     .join("");
 }
 
-async function obtenerNuevoNumeroFactura() {
+async function obtenerNumeroPresupuesto() {
   try {
-    const response = await fetch("http://localhost:3001/facturaventas");
-    const facturas = await response.json();
-    const ultimoIdFactura = facturas[facturas.length - 1]?.NroFacv || 0;
-    return ultimoIdFactura + 1;
+    const response = await fetch("http://localhost:3001/presupuesto");
+    const presupuesto = await response.json();
+    const ultimoPresupuesto =
+      presupuesto[presupuesto.length - 1]?.IDPedido || 0;
+    return ultimoPresupuesto + 1;
   } catch (error) {
     console.error("Error al obtener el número de factura:", error);
     return null;

@@ -9,6 +9,7 @@ import { pedidosRouter } from "../routes/pedidos.js";
 import { detallePedidosRouter } from "../routes/detallePedidos.js";
 import { ventasRouter } from "../routes/facturaVentas.js";
 import { detalleFacturaRouter } from '../routes/detalleFacturaVenta.js'
+import { presupuestosRouter } from '../routes/presupuesto.js'
 //import validate from '../schemas/clientes/clientes.js'
 import cors from "cors";
 
@@ -28,6 +29,7 @@ app.use("/pedidos", pedidosRouter);
 app.use("/detallePedidos", detallePedidosRouter);
 app.use("/facturaventas", ventasRouter);
 app.use("/detallefacturaventas", detalleFacturaRouter);
+app.use("/presupuesto", presupuestosRouter);
 
 const PORT = process.env.PORT ?? 3001;
 
