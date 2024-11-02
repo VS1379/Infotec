@@ -9,13 +9,53 @@ export class pedidoController {
       res.status(500).json({ message: "Error al obtener los pedidos" });
     }
   }
+  static async getAllRegistrado(req, res) {
+    try {
+      const pedidos = await pedidoModel.getAllRegistrado();
+      res.json(pedidos);
+    } catch (error) {
+      res
+        .status(500)
+        .json({ message: "Error al obtener los pedidos Registrados" });
+    }
+  }
+  static async getAllPresupuestado(req, res) {
+    try {
+      const pedidos = await pedidoModel.getAllPresupuestado();
+      res.json(pedidos);
+    } catch (error) {
+      res
+        .status(500)
+        .json({ message: "Error al obtener los Pedidos Presupuestados" });
+    }
+  }
+  static async getAllCancelado(req, res) {
+    try {
+      const pedidos = await pedidoModel.getAllCancelado();
+      res.json(pedidos);
+    } catch (error) {
+      res
+        .status(500)
+        .json({ message: "Error al obtener los Pedidos Cancelados" });
+    }
+  }
+  static async getAllFinalizado(req, res) {
+    try {
+      const pedidos = await pedidoModel.getAllFinalizado();
+      res.json(pedidos);
+    } catch (error) {
+      res
+        .status(500)
+        .json({ message: "Error al obtener los Pedidos Finalizados" });
+    }
+  }
 
   static async getById(req, res) {
     try {
       const { id } = req.params;
       const pedido = await pedidoModel.getById(id);
       if (pedido) return res.json(pedido);
-      res.status(404).json({ message: "Pedido no encontrado" });
+      res.status(404).json({ message: `Pedido no encontrado ${id}` });
     } catch (error) {
       res.status(500).json({ message: "Error al obtener el pedido" });
     }
@@ -61,14 +101,14 @@ export class pedidoController {
       const { numeroPedido } = req.params;
 
       const pedido = await pedidoModel.getById(numeroPedido);
-      
+
       if (!pedido || pedido.condicion === 1) {
         return res
           .status(400)
           .json({ message: "No se puede cancelar el pedido" });
       }
       // Actualizar la condición a "Cancelado"
-      await pedidoModel.actualizarCondicion(numeroPedido, "Cancelado");
+      await pedidoModel.actualizarCondicion(numeroPedido, 2);
 
       res.json({ message: "Pedido cancelado correctamente" });
     } catch (error) {

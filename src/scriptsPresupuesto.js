@@ -332,6 +332,7 @@ async function imprimirComprobante(factura, detallesCliente, detallesFactura) {
 
   // Convertir la forma de pago en texto
   factura.FormaDePago =
+
     ["", "Efectivo", "Tarjeta", "Cheque", "Cuotas"][factura.FormaDePago] ||
     "Otra";
 

@@ -15,6 +15,30 @@ export class pedidoModel {
     const [result] = await connection.query("SELECT * FROM pedidos");
     return result;
   }
+  static async getAllRegistrado() {
+    const [result] = await connection.query(
+      "SELECT * FROM `pedidos` WHERE `Condicion` = 0"
+    );
+    return result;
+  }
+  static async getAllPresupuestado() {
+    const [result] = await connection.query(
+      "SELECT * FROM `pedidos` WHERE `Condicion` = 1"
+    );
+    return result;
+  }
+  static async getAllCancelado() {
+    const [result] = await connection.query(
+      "SELECT * FROM `pedidos` WHERE `Condicion` = 2"
+    );
+    return result;
+  }
+  static async getAllFinalizado() {
+    const [result] = await connection.query(
+      "SELECT * FROM `pedidos` WHERE `Condicion` = 3"
+    );
+    return result;
+  }
 
   static async getById(id) {
     const [result] = await connection.query(
@@ -26,7 +50,7 @@ export class pedidoModel {
 
   static async actualizarCondicion(id, condicion) {
     const [result] = await connection.query(
-      "UPDATE pedidos SET condicion = ? WHERE IDPedido = ?",
+      "UPDATE pedidos SET Condicion = ? WHERE IDPedido = ?",
       [condicion, id]
     );
     return result;
