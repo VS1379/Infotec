@@ -11,6 +11,7 @@ import { ventasRouter } from "../routes/facturaVentas.js";
 import { detalleFacturaRouter } from '../routes/detalleFacturaVenta.js'
 import { presupuestosRouter } from '../routes/presupuesto.js'
 import { cobroRouter } from '../routes/cobro.js'
+import { bancoRouter } from '../routes/bancos.js'
 //import validate from '../schemas/clientes/clientes.js'
 import cors from "cors";
 
@@ -33,6 +34,7 @@ app.use("/facturaventas", ventasRouter);
 app.use("/detallefacturaventas", detalleFacturaRouter);
 app.use("/presupuesto", presupuestosRouter);
 app.use("/cobros", cobroRouter)
+app.use("/bancos", bancoRouter)
 
 const PORT = process.env.PORT ?? 3001;
 

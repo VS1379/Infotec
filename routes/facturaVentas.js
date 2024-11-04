@@ -6,6 +6,9 @@ export const ventasRouter = Router();
 // Crear una nueva venta
 ventasRouter.get("/", ventaController.getAll);
 
+//cobrar
+ventasRouter.get("/cobrar/", ventaController.getAllCobrar);
+
 // Obtener los detalles de una venta por número de factura
 ventasRouter.get("/:numeroFactura", ventaController.getByNumeroFactura);
 

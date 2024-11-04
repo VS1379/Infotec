@@ -11,6 +11,16 @@ export const ventaController = {
     }
   },
 
+  async getAllCobrar(req, res) {
+    try {
+      const ventas = await ventaModel.getAllCobrar();
+      res.json(ventas);
+    } catch (error) {
+      console.error("Error al obtener las ventas:", error);
+      res.status(500).json({ error: "Error al obtener las ventas" });
+    }
+  },
+
   async crear(req, res) {
     try {
       const {

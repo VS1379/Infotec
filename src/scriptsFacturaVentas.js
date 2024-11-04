@@ -451,7 +451,7 @@ async function obtenerYImprimirComprobante(factura, detallesFactura) {
 async function imprimirComprobante(factura, detallesCliente, detallesFactura) {
   // Convertir la forma de pago en texto
   factura.FormaDePago =
-    ["", "Efectivo", "Tarjeta", "Cheque", "Cuotas"][factura.FormaDePago] ||
+    ["", "Contado", "Cuotas", "Cheque", "Depósito"][factura.FormaDePago] ||
     "Desconocido";
 
   // Esperar el resultado de obtenerDetallesProductos para generar los detalles del producto

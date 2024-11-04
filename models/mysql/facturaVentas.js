@@ -16,6 +16,13 @@ export class ventaModel {
     return rows;
   }
 
+  static async getAllCobrar() {
+    const [rows] = await connection.query(
+      "SELECT * FROM facturas_venta WHERE CantidadDeCuotas > 0 "
+    );
+    return rows;
+  }
+
   static async crear(
     IDCliente,
     IDPedido,
