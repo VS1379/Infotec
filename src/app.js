@@ -5,11 +5,12 @@ import { proveedoresRouter } from "../routes/proveedores.js";
 import { hardwareRouter } from "../routes/hardware.js";
 import { marcaRouter } from "../routes/marca.js";
 import { tipoHardwareRouter } from "../routes/tipoHarware.js";
-import { pedidosRouter } from "../routes/pedidos.js";
+import { pedidosRouter } from "../routes/pedidos.js"; 
 import { detallePedidosRouter } from "../routes/detallePedidos.js";
 import { ventasRouter } from "../routes/facturaVentas.js";
 import { detalleFacturaRouter } from '../routes/detalleFacturaVenta.js'
 import { presupuestosRouter } from '../routes/presupuesto.js'
+import { cobroRouter } from '../routes/cobro.js'
 //import validate from '../schemas/clientes/clientes.js'
 import cors from "cors";
 
@@ -28,8 +29,10 @@ app.use("/tipohardware", tipoHardwareRouter);
 app.use("/pedidos", pedidosRouter);
 app.use("/detallePedidos", detallePedidosRouter);
 app.use("/facturaventas", ventasRouter);
+//app.use("/facturcompra", ventasRouter);
 app.use("/detallefacturaventas", detalleFacturaRouter);
 app.use("/presupuesto", presupuestosRouter);
+app.use("/cobros", cobroRouter)
 
 const PORT = process.env.PORT ?? 3001;
 

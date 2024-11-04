@@ -52,4 +52,41 @@ export class detalleFacturaController {
         .json({ message: "Error al eliminar el detalle de factura" });
     }
   }
+
+  static async crearCobro(req, res) {
+    try {
+      const { numeroFactura, fecha, monto, formaPago, numeroCheque, banco } =
+        req.body;
+      const nuevoCobroId = await detalleFacturaModel.crear({
+        numeroFactura,
+        fecha,
+        monto,
+        formaPago,
+        numeroCheque,
+        banco,
+      });
+      res
+        .status(201)
+        .json({ message: "Cobro registrado exitosamente", id: nuevoCobroId });
+    } catch (error) {
+      res.status(500).json({ message: "Error al registrar el cobro", error });
+    }
+  }
+
+  static async actualizarCuotas(req, res) {
+    try {
+      const { numeroFactura } = req.params;
+      const facturaActualizada = await detalleFacturaModel.actualizarCuotas(numeroFactura);
+
+      if (facturaActualizada) {
+        res.json({ message: "Cuotas actualizadas exitosamente" });
+      } else {
+        res.status(404).json({ message: "Factura no encontrada o ya pagada" });
+      }
+    } catch (error) {
+      res
+        .status(500)
+        .json({ message: "Error al actualizar las cuotas", error });
+    }
+  }
 }

@@ -84,4 +84,21 @@ export class ventaModel {
     `;
     await connection.query(query, [numeroFactura]);
   }
+
+  static async restarCuota(numeroFactura) {
+    const [result] = await connection.query(
+      "SELECT CantidadDeCuotas FROM facturas_venta WHERE NroFacv = ?",
+      [numeroFactura]
+    );
+
+    if (result.length > 0 && result[0].cantidadCuotas > 0) {
+      // Resta una cuota
+      await connection.query(
+        "UPDATE facturas_venta SET CantidadDeCuotas = CantidadDeCuotas - 1 WHERE NroFacv = ?",
+        [numeroFactura]
+      );
+      return true;
+    }
+    return false;
+  }
 }

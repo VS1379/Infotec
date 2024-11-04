@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Registrar Cobro de Hardware</title>
+    <style>
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      table,
+      th,
+      td {
+        border: 1px solid black;
+      }
+      th,
+      td {
+        padding: 10px;
+        text-align: left;
+      }
+      th {
+        background-color: #f2f2f2;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>Registrar Cobro de Hardware</h2>
+    <form id="formCobro">
+      <fieldset>
+        <legend>Datos de la Factura</legend>
+
+        <label for="factura">Seleccionar Factura:</label>
+        <select id="numeroFactura" required>
+          <option value="No Seleccionado">Seleccione una factura</option>
+        </select>
+        <span id="facturaMessage"></span>
+        <br /><br />
+
+        <label for="fechaVenta">Fecha de Venta:</label>
+        <input type="text" id="clienteId" value="" readonly />
+        <br /><br />
+
+        <label for="iva">IVA: %</label>
+        <input type="number" id="IVA" value="" readonly />
+        <br /><br />
+
+        <label for="formaPago">Forma de Pago:</label>
+        <input id="formaPago" readonly disabled />
+        <br /><br />
+
+        <label for="cuotas">Cantidad de Cuotas/Cheques:</label>
+        <input type="number" id="cantCuotas" readonly />
+        <br /><br />
+
+        <label for="tipoPeriodo">Tipo de Período:</label>
+        <input id="tipoPeriodo" readonly disabled />
+      </fieldset>
+
+      <fieldset>
+        <legend>Datos del Pedido</legend>
+        <label for="pedido">Pedido Seleccionado:</label>
+        <input type="text" id="pedidoId" value="" readonly />
+      </fieldset>
+
+      <fieldset>
+        <legend>Datos del Cliente</legend>
+        <label for="clienteDni">Dni:</label>
+        <input type="number" id="clienteDni" value="" readonly />
+        <br /><br />
+        <label for="clienteNombre">Nombre:</label>
+        <input type="text" id="clienteName" value="" readonly />
+      </fieldset>
+
+      <fieldset>
+        <legend>Detalles del Hardware Vendido</legend>
+        <table id="detallesVenta">
+          <thead>
+            <tr>
+              <th>Item Nro</th>
+              <th>Tipo</th>
+              <th>Marca</th>
+              <th>Características</th>
+              <th>Cantidad</th>
+              <th>Precio Unitario</th>
+              <th>Precio Total</th>
+              <th></th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+        <table>
+          <thead>
+            <tr>
+              <th id="montoColumna">MONTO: $</th>
+            </tr>
+          </thead>
+        </table>
+        <table>
+          <thead>
+            <tr>
+              <th id="ivaColumna">IVA: %</th>
+              <th id="montoTotalColumna">MONTO TOTAL: %</th>
+            </tr>
+          </thead>
+        </table>
+      </fieldset>
+
+      <button type="button" onclick="finalizarCobro()">Finalizar Venta</button>
+    </form>
+
+    <br />
+    <a href="facturaIndex.html">Volver al inicio</a>
+    <br />
+
+    <script src="scriptsFacturaCobros.js"></script>
+  </body>
+</html>

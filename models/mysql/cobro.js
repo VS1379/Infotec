@@ -1,23 +1,32 @@
+import mysql from "mysql2/promise";
+
+const config = {
+  host: "localhost",
+  user: "root",
+  port: 3306,
+  password: "",
+  database: "infotec",
+};
+
+const connection = await mysql.createConnection(config);
+
 export class cobroModel {
-  static async registrar({
-    numeroFactura,
-    fecha,
-    monto,
-    formaPago,
-    numeroCheque,
-    banco,
-  }) {
-    const query = `
-        INSERT INTO cobros (numero_factura, fecha, monto, forma_pago, numero_cheque, banco)
-        VALUES (?, ?, ?, ?, ?, ?)
-      `;
-    await connection.query(query, [
-      numeroFactura,
-      fecha,
-      monto,
-      formaPago,
-      numeroCheque,
-      banco,
-    ]);
+  static async getAll() {
+    const [rows] = await connection.query("SELECT * FROM cobros");
+    return rows;
+  }
+  static async crear(cobro) {
+    const [result] = await connection.query(
+      "INSERT INTO cobros (NroFacv, FechaCobro, Monto, Tipo, NroCheque, IdBanco) VALUES (?, ?, ?, ?, ?, ?)",
+      [
+        cobro.numeroFactura,
+        cobro.fecha,
+        cobro.monto,
+        cobro.formaPago,
+        cobro.numeroCheque,
+        cobro.banco,
+      ]
+    );
+    return result.insertId;
   }
 }

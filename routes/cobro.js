@@ -1,7 +1,13 @@
-import { Router } from 'express';
-import { cobroController } from '../controllers/cobros.js';
+import { Router } from "express";
+import { cobroController } from "../controllers/cobro.js";
 
-export const cobrosRouter = Router();
+export const cobroRouter = Router();
 
-// Registrar un cobro
-cobrosRouter.post('/cobrosRegistrar', cobroController.registrar);
+cobroRouter.get("/", cobroController.getAll)
+
+cobroRouter.post("/", cobroController.crear);
+
+cobroRouter.patch(
+  "/actualizar-cuotas/:numeroFactura",
+  cobroController.actualizarCuotas
+);

@@ -14,3 +14,6 @@ detalleFacturaRouter.post('/', detalleFacturaController.crear);
 
 // Eliminar un detalle de factura
 detalleFacturaRouter.delete('/:id', detalleFacturaController.eliminar);
+
+detalleFacturaRouter.post('/cobrar/', detalleFacturaController.crearCobro);
+
