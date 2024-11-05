@@ -35,7 +35,7 @@ export class cobroController {
     try {
       const { numeroFactura } = req.params;
       const facturaActualizada = await ventaModel.restarCuota(numeroFactura);
-
+      
       if (facturaActualizada) {
         res.json({ message: "Cuotas actualizadas exitosamente" });
       } else {

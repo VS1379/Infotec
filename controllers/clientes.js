@@ -25,7 +25,7 @@ export class clienteController {
   static async getByField(req, res) {
     try {
       const { field, data } = req.query;
-      const validFields = ['DNI', 'CUIT', 'NOMBRE', 'DIRECCION', 'TELEFONO', 'CORREO'];
+      const validFields = ['ID_Cliente', 'DNI', 'CUIT', 'NOMBRE', 'DIRECCION', 'TELEFONO', 'CORREO'];
       if (!validFields.includes(field)) {
         return res.status(400).json({ message: 'Campo inválido para la búsqueda' });
       }

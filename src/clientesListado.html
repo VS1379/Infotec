@@ -1,0 +1,49 @@
+<div id="facturaSection">
+  <h1>Lista de Clientes</h1>
+  <style>
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    table,
+    th,
+    td {
+      border: 1px solid black;
+    }
+    th,
+    td {
+      padding: 10px;
+      text-align: center;
+    }
+    th {
+      background-color: #f2f2f2;
+    }
+    button {
+        display: flex;
+        border-radius: 2px;
+        margin: auto;
+        background-color: red;
+        color: black  ;
+    }
+  </style>
+  <table>
+    <thead>
+      <tr>
+        <th><h3>Item</h4></th>
+        <th><h3>DNI</h4></th>
+        <th><h3>Cuit</h3></th>
+        <th><h3>Nombre</h3></th>
+        <th><h3>Direccion</h3></th>
+        <th><h3>Telefono</h3></th>
+        <th><h3>Correo</h3></th>
+      </tr>
+    </thead>
+    <tbody id="clienteContainer">
+      <!-- facturas aca -->
+    </tbody>
+  </table>
+</div>
+<br>
+    <a href="informes.html">Volver a Listados</a> 
+    <br/>
+<script src="scriptsClientesListado.js"></script>

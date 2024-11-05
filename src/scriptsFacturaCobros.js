@@ -48,10 +48,13 @@ async function cargarDetallesFactura(facturaId) {
       "http://localhost:3001/detallefacturaventas"
     );
     const detallesFactura = await detalleResponse.json();
-
     const detallesFiltrados = detallesFactura.filter(
       (detalle) => detalle.NroFacv === factura.NroFacv
     );
+
+    document.getElementById("IVA").value = (
+      detallesFiltrados[0].IVA * 100
+    ).toFixed(2);
     cargarDetallesHardware(detallesFiltrados);
   } catch (error) {
     console.error("Error al cargar los detalles de la factura:", error);
@@ -100,15 +103,11 @@ async function cargarDetallesHardware(detallesFiltrados) {
         `http://localhost:3001/tipohardware/${hardware[0].ID_Tipohard}`
       );
       const tipo = await tipoResponse.json();
-      console.log(
-        `http://localhost:3001/tipohardware/${hardware[0].ID_Tipohard}`
-      );
 
       const marcaResponse = await fetch(
         `http://localhost:3001/marca/${hardware[0].ID_Marca}`
       );
       const marca = await marcaResponse.json();
-      console.log(`http://localhost:3001/marca/${hardware[0].ID_Marca}`);
 
       const row = document.createElement("tr");
       row.innerHTML = `
@@ -121,10 +120,40 @@ async function cargarDetallesHardware(detallesFiltrados) {
         <td>${(detalle.Cantidad * hardware[0].PRECIO_UNITARIO).toFixed(2)}</td>
       `;
       detallesVentaTableBody.appendChild(row);
+      cargarMontoIvaMontoTotal();
     }
   } catch (error) {
     console.error("Error al cargar los detalles del hardware vendido:", error);
   }
+}
+
+function cargarMontoIvaMontoTotal() {
+  let total = 0;
+
+  const tabla = document.getElementById("detallesVenta");
+
+  for (let i = 1; i < tabla.rows.length; i++) {
+    const celda = tabla.rows[i].cells[6];
+
+    if (celda) {
+      const valor = parseFloat(celda.textContent) || 0;
+      total += valor;
+    }
+  }
+
+  document.getElementById("montoColumna").textContent =
+    "MONTO: $" + total.toFixed(0);
+
+  document.getElementById("ivaColumna").textContent =
+    "IVA: %" + (document.getElementById("IVA").value || 0);
+
+  total = parseFloat(total);
+
+  document.getElementById("montoTotalColumna").textContent =
+    "MONTO TOTAL: $" +
+    (
+      ((document.getElementById("IVA").value * total) / 100 || 0) + total
+    ).toFixed(0);
 }
 
 // Resto de funciones sin cambios
@@ -163,6 +192,15 @@ function registrarCobro() {
     : null;
   const banco = cheque ? document.getElementById("banco").value : null;
 
+  if ((formaPago = "Contado")) {
+    formaPago = 1;
+  } else if ((formaPago = "Cuotas")) {
+    formaPago = 2;
+  } else if ((formaPago = "Cheque")) {
+    formaPago = 3;
+  } else {
+    formaPago = 4;
+  }
   fetch("http://localhost:3001/cobros", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -170,7 +208,7 @@ function registrarCobro() {
       numeroFactura,
       fecha,
       monto,
-      formaPago: cheque ? "Cheque" : "Otro",
+      formaPago,
       numeroCheque,
       banco,
     }),
@@ -187,9 +225,11 @@ function registrarCobro() {
 }
 
 function actualizarCuotas(numeroFactura) {
-  fetch(`http://localhost:3001/facturas/actualizar-cuotas/${numeroFactura}`, {
+  console.log(numeroFactura);
+  
+  fetch(`http://localhost:3001/cobros/actualizar-cuotas/${numeroFactura}`, {
     method: "PATCH",
-    headers: { "Content-Type": "application/json" },
+   //headers: { "Content-Type": "application/json" },
   })
     .then((response) => response.json())
     .then((data) => {

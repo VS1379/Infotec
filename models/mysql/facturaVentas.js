@@ -97,9 +97,8 @@ export class ventaModel {
       "SELECT CantidadDeCuotas FROM facturas_venta WHERE NroFacv = ?",
       [numeroFactura]
     );
-
-    if (result.length > 0 && result[0].cantidadCuotas > 0) {
-      // Resta una cuota
+    
+    if (result.length > 0 && result[0].CantidadDeCuotas > 0) {
       await connection.query(
         "UPDATE facturas_venta SET CantidadDeCuotas = CantidadDeCuotas - 1 WHERE NroFacv = ?",
         [numeroFactura]
