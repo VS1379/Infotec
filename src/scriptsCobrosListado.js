@@ -23,6 +23,7 @@ async function cargarCobros() {
 
     const cobrosContainer = document.getElementById("cobrosContainer");
     cobrosContainer.innerHTML = `<h1>Cobros Realizados</h1>`;
+    console.log(facturas);
 
     for (const [tipoPago, cobros] of Object.entries(cobrosPorTipo)) {
       cobrosContainer.innerHTML += `<h2>Forma de pago: ${tipoPago}</h2>
@@ -37,8 +38,8 @@ async function cargarCobros() {
         </thead>
         <tbody>
           ${cobros
-            .map(
-              (cobro) => `
+          .map(
+            (cobro) => `
             <tr>
               <td>${new Date(cobro.Fecha).toLocaleDateString("es-AR")}</td>
               <td>${cobro.IdBanco || "N/A"}</td>
@@ -46,8 +47,8 @@ async function cargarCobros() {
               <td>${parseFloat(cobro.MontoTotal).toFixed(2)} $</td>
             </tr>
           `
-            )
-            .join("")}
+          )
+          .join("")}
         </tbody>
       </table>`;
     }
