@@ -12,7 +12,7 @@ const connection = await mysql.createConnection(config);
 
 export class clienteModel {
     static async getAll() {
-        const [rows] = await connection.query('SELECT * FROM clientes');
+        const [rows] = await connection.query('SELECT * FROM `clientes` ORDER BY `clientes`.`NOMBRE` ASC');
         return rows;
     }
 

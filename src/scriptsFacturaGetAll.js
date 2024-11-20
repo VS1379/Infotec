@@ -21,29 +21,27 @@ async function cargarFacturas() {
     // Genera las filas de la tabla para cada factura
     for (const [index, factura] of facturas.entries()) {
       const row = document.createElement("tr");
-      const formaPago = ["Contado", "Cuotas", "Cheque", "Depósito"];
+      const formaPago = ["Contado", "Cuotas", "Cheque", "Deposito"];
 
       // Obtiene el nombre del cliente si no está en la factura
       let clienteNombre = factura.ClienteNombre || "No especificado";
       if (!factura.ClienteNombre && factura.IDCliente) {
+
         const clienteResponse = await fetch(
-          `http://localhost:3001/clientes/buscar/campo?field=ID_Cliente&data=${factura.IDCliente}`
+          `http://localhost:3001/clientes/buscar/campo?field=DNI&data=${factura.IDCliente}`
         );
         const cliente = await clienteResponse.json();
-        
-        //console.log(cliente[0]);
-        
-        //clienteNombre = cliente[0].NOMBRE || "No especificado";
+
+        clienteNombre = cliente[0].NOMBRE || "No especificado";
       }
 
       // Genera la fila de la tabla con el enlace al pedido
       row.innerHTML = `
             <td>${index + 1}</td>
             <td>${factura.NroFacv}</td>
-            <td><a href="pedidos-getAll.html?pedido=${factura.IDPedido}">${
-        factura.IDPedido
-      }</a></td>
-            <td>${clienteNombre}</td>
+            <td><a href="pedidos-getAll.html?pedido=${factura.IDPedido}">${factura.IDPedido
+        }</a></td>
+            <td>DNI: ${factura.IDCliente} Nombre: ${clienteNombre}</td>
             <td>${new Date(factura.Fecha).toLocaleString()}</td>
             <td>${factura.MontoTotal}</td>
             <td>${formaPago[factura.FormaDePago]}</td>

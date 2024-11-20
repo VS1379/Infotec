@@ -39,7 +39,7 @@ async function cargarDetallesFactura(facturaId) {
 
     const formaPago = ["Contado", "Cuotas", "Cheque", "Depósito"];
 
-    document.getElementById("formaPago").value = formaPago[factura.FormaDePago];
+    document.getElementById("formaPago").value = formaPago[factura.FormaDePago - 1];
     document.getElementById("cantCuotas").value = factura.CantidadDeCuotas;
     document.getElementById("tipoPeriodo").value = factura.PeriodoDeCuotas;
     cargarDatosPedido(factura.IDPedido);
@@ -154,6 +154,12 @@ function cargarMontoIvaMontoTotal() {
     (
       ((document.getElementById("IVA").value * total) / 100 || 0) + total
     ).toFixed(0);
+
+  // document.getElementById("monto").value = (
+  //   (
+  //     ((document.getElementById("IVA").value * total) / 100 || 0) + total
+  //   ).toFixed(0)
+  //   / document.getElementById("cantCuotas").value).toFixed(2);
 }
 
 // Resto de funciones sin cambios
@@ -185,22 +191,23 @@ async function cargarBancos() {
 function registrarCobro() {
   const numeroFactura = document.getElementById("numeroFactura").value;
   const fecha = document.getElementById("fechaCobro").value;
+  let formaPago = document.getElementById("formaPago").value;
   const monto = document.getElementById("monto").value;
   const cheque = document.getElementById("cheque").checked;
   const numeroCheque = cheque
     ? document.getElementById("numeroCheque").value
-    : null;
-  const banco = cheque ? document.getElementById("banco").value : null;
-
-  if ((formaPago = "Contado")) {
+    : 0;
+  const banco = cheque ? document.getElementById("banco").value : 0;
+  if ((formaPago == "Contado")) {
     formaPago = 1;
-  } else if ((formaPago = "Cuotas")) {
+  } else if ((formaPago == "Cuotas")) {
     formaPago = 2;
-  } else if ((formaPago = "Cheque")) {
+  } else if ((formaPago == "Cheque")) {
     formaPago = 3;
   } else {
     formaPago = 4;
   }
+
   fetch("http://localhost:3001/cobros", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -220,16 +227,16 @@ function registrarCobro() {
     })
     .catch((error) => {
       console.error("Error al registrar el cobro:", error);
+
       alert("Error al registrar el cobro.");
     });
 }
 
 function actualizarCuotas(numeroFactura) {
-  console.log(numeroFactura);
-  
+
   fetch(`http://localhost:3001/cobros/actualizar-cuotas/${numeroFactura}`, {
     method: "PATCH",
-   //headers: { "Content-Type": "application/json" },
+    //headers: { "Content-Type": "application/json" },
   })
     .then((response) => response.json())
     .then((data) => {

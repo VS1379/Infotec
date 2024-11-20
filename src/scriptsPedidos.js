@@ -2,7 +2,6 @@ document.addEventListener("DOMContentLoaded", () => {
   cargarClientes();
   cargarTiposHardware();
   cargarMarcasHardware();
-  cargarHardwarePorTipoYMarca();
   document
     .getElementById("formPedido")
     .addEventListener("submit", finalizarPedido);
@@ -159,6 +158,7 @@ async function cargarHardwarePorTipoYMarca() {
     console.error("Error al cargar el hardware filtrado:", error);
   }
 }
+
 
 const formulario = document.getElementById("formPedido");
 
@@ -327,6 +327,9 @@ async function finalizarPedido(event) {
     console.error("Error al finalizar el pedido:", error);
     alert(error.message);
   }
+  setTimeout(() => {
+    location.reload();
+  }, 3000);
 }
 
 // Función para imprimir el comprobante del pedido
@@ -405,50 +408,63 @@ document
 
 // Modificar la función agregarDetalle para llamar a validarBotones
 function agregarDetalle() {
+  const fechaPedido = document.getElementById("fechaPedido").value; // Obtener la fecha seleccionada
+  const hardwareSelect = document.getElementById("hardware");
+  const idHardware = hardwareSelect.value;
+  const hardwareTexto = hardwareSelect.selectedOptions[0].textContent;
+  const cantidad = document.getElementById("cantidad").value;
+
+  // Validaciones
+  if (!fechaPedido) {
+    alert("Debe seleccionar una fecha para el pedido.");
+    return;
+  }
+
+  if (
+    !idHardware ||
+    hardwareTexto === "No hay hardware disponible con los filtros seleccionados."
+  ) {
+    alert("Debe seleccionar un hardware válido.");
+    return;
+  }
+
+  if (!cantidad || isNaN(cantidad) || cantidad <= 0) {
+    alert("Debe ingresar una cantidad mayor a 0.");
+    return;
+  }
+
+  // Si todas las validaciones pasan, agregar el detalle
   const tipoHardware =
     document.getElementById("tipoHardware").selectedOptions[0].textContent;
   const marcaHardware =
     document.getElementById("marcaHardware").selectedOptions[0].textContent;
-  const hardwareSelect = document.getElementById("hardware");
-  const idHardware = hardwareSelect.value;
-  const hardwareCaracteristicas = hardwareSelect.selectedOptions[0].textContent;
 
-  const partes = hardwareCaracteristicas.split(" - $")[1];
-  const precio = partes[0];
-  const cantidad = document.getElementById("cantidad").value;
-  const stock = partes[1];
+  // Obtener precio y stock del texto del hardware seleccionado
+  const partes = hardwareTexto.split(" - $");
+  const precio = partes[1]?.split(" Cant. ")[0]; // Extraer precio unitario
+  const stock = parseInt(partes[1]?.split(" Cant. ")[1], 10); // Extraer unidades disponibles
   const estado = stock >= cantidad ? "Disponible" : "Sin stock";
-
-  if (!idHardware || cantidad === "" || cantidad <= 0) {
-    alert("Debe seleccionar un hardware válido y una cantidad mayor a 0.");
-    return;
-  }
 
   // Crear la fila para la tabla de detalles del pedido
   const tbody = document.querySelector("#detallesPedido tbody");
   const fila = document.createElement("tr");
 
-  // Agregar celdas visibles para la información del hardware
   fila.innerHTML = `
     <td>${tipoHardware}</td>
     <td>${marcaHardware}</td>
-    <td>${hardwareCaracteristicas}</td>
+    <td>${hardwareTexto}</td>
     <td>$${precio}</td>
     <td>${cantidad}</td>
     <td>${stock}</td>
     <td>${estado}</td>
+    <td style="display: none;">${idHardware}</td>
   `;
 
-  // Crear una celda oculta para almacenar el ID del hardware
-  const tdIdOculto = document.createElement("td");
-  tdIdOculto.style.display = "none";
-  tdIdOculto.textContent = idHardware;
-  fila.appendChild(tdIdOculto);
-
-  // Agregar la fila al cuerpo de la tabla
   tbody.appendChild(fila);
 
-  // Limpiar el formulario después de agregar el detalle
+  // Limpiar los campos después de agregar el detalle
   document.getElementById("cantidad").value = "";
   document.getElementById("hardware").selectedIndex = 0;
+  alert("Detalle agregado exitosamente.");
 }
+

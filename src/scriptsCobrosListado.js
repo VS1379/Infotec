@@ -1,29 +1,36 @@
-// scriptsCobrosListado.js
-
 document.addEventListener("DOMContentLoaded", function () {
   cargarCobros();
 });
 
 async function cargarCobros() {
   try {
-    const response = await fetch("http://localhost:3001/facturaventas/cobrar");
-    const facturas = await response.json();
+    const response = await fetch("http://localhost:3001/cobros");
+    const cobros = await response.json();
+
+    const bancosResponse = await fetch("http://localhost:3001/bancos");
+    const bancos = await bancosResponse.json();
+
+    // Crear un mapa para acceder rápidamente al nombre del banco por IdBanco
+    const bancosMap = bancos.reduce((map, banco) => {
+      map[banco.IdBanco] = banco.Nombre;
+      return map;
+    }, {});
+
 
     const formaPagoLabels = ["Contado", "Cuotas", "Cheque", "Depósito"];
     const cobrosPorTipo = {};
     let montoTotalCobrado = 0;
 
     // Agrupa los cobros por Forma de Pago y acumula el monto total
-    facturas.forEach((factura) => {
-      const tipoPago = formaPagoLabels[factura.FormaDePago - 1] || "Otro";
+    cobros.forEach((cobro) => {
+      const tipoPago = formaPagoLabels[cobro.Tipo - 1] || "Otro";
       if (!cobrosPorTipo[tipoPago]) cobrosPorTipo[tipoPago] = [];
-      cobrosPorTipo[tipoPago].push(factura);
-      montoTotalCobrado += parseFloat(factura.MontoTotal) || 0;
+      cobrosPorTipo[tipoPago].push(cobro);
+      montoTotalCobrado += parseFloat(cobro.Monto) || 0;
     });
 
     const cobrosContainer = document.getElementById("cobrosContainer");
     cobrosContainer.innerHTML = `<h1>Cobros Realizados</h1>`;
-    console.log(facturas);
 
     for (const [tipoPago, cobros] of Object.entries(cobrosPorTipo)) {
       cobrosContainer.innerHTML += `<h2>Forma de pago: ${tipoPago}</h2>
@@ -32,22 +39,23 @@ async function cargarCobros() {
           <tr>
             <th>Fecha</th>
             <th>Banco</th>
-            <th>Nro Cheque</th>
+            <th>Nro Cheque/Cuota</th>
             <th>Monto</th>
           </tr>
         </thead>
         <tbody>
           ${cobros
-          .map(
-            (cobro) => `
-            <tr>
-              <td>${new Date(cobro.Fecha).toLocaleDateString("es-AR")}</td>
-              <td>${cobro.IdBanco || "N/A"}</td>
-              <td>${cobro.NroCheque || "N/A"}</td>
-              <td>${parseFloat(cobro.MontoTotal).toFixed(2)} $</td>
-            </tr>
-          `
-          )
+          .map((cobro) => {
+            const nombreBanco = bancosMap[cobro.IdBanco] || "N/A";
+            return `
+                <tr>
+                  <td>${new Date(cobro.FechaCobro).toLocaleDateString("es-AR")}</td>
+                  <td>${nombreBanco}</td>
+                  <td>${cobro.NroCheque || cobro.CantidadDeCuotas || "N/A"}</td>
+                  <td>${parseFloat(cobro.Monto).toFixed(2)} $</td>
+                </tr>
+              `;
+          })
           .join("")}
         </tbody>
       </table>`;

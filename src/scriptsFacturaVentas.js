@@ -2,42 +2,6 @@ document.addEventListener("DOMContentLoaded", function () {
   cargarPedidos();
 });
 
-/*
-document.addEventListener("DOMContentLoaded", () => {
-  const facturaInput = document.getElementById("numeroFactura");
-  const messageContainer = document.getElementById("facturaMessage");
-  const submitButton = document.getElementById("submitButton");
-  facturaInput.addEventListener("blur", async () => {
-    const facturaNumber = facturaInput.value;
-    
-    messageContainer.textContent = "";
-
-    if (facturaNumber) {
-      try {
-        const response = await fetch(
-          http://localhost:3001/facturaventa/${facturaNumber}
-        );
-
-        if (!response.ok) {
-          throw new Error("Error en la petición");
-        }
-
-        const data = await response.json();
-
-        if (data) {
-          messageContainer.textContent = "Nro no disponible";
-          messageContainer.style.color = "red";
-          submitButton.disabled = true;
-        } else {
-          submitButton.disabled = false;
-        }
-      } catch (error) {
-        console.error("Error al verificar el número de factura:", error);
-      }
-    }
-  });
-});
-*/
 function cargarPedidos() {
   fetch("http://localhost:3001/pedidos")
     .then((response) => response.json())
@@ -260,61 +224,52 @@ function cargarMontoIvaMontoTotal() {
 }
 
 async function finalizarVenta() {
-  const pedidoSelect = document.getElementById("pedido");
-  const idCliente = pedidoSelect.value; // Obtener el ID del cliente desde el select
+  if (!comprobarCampos()) return;
+
+  const idCliente = document.getElementById("clienteId").value;
 
   if (!idCliente) {
     alert("Por favor, seleccione un pedido.");
-    return; // Salir de la función si no se seleccionó un pedido
+    return;
   }
 
-  // Obtener el nuevo número de factura
   const nuevoNumeroFactura = await obtenerNuevoNumeroFactura();
   if (nuevoNumeroFactura === null) {
     alert("Error al obtener el número de factura.");
     return;
   }
 
-  let iva = parseFloat(document.getElementById("IVA").value) / 100;
+  const ivaPorcentaje = parseFloat(document.getElementById("IVA").value);
+  const iva = ivaPorcentaje / 100;
 
   const detallesTable = document
     .getElementById("detallesVenta")
     .querySelector("tbody");
-  const promesas = []; // Array para almacenar todas las promesas
-
-  let montoTotalFactura = 0;
-  let stockSuficiente = true; // Bandera para verificar stock
-
+  const promesas = [];
   const detallesFacturaArray = [];
+  let montoTotalFactura = 0;
+  let stockSuficiente = true;
 
-  // Iterar sobre cada fila de la tabla de detalles
   for (let row of detallesTable.rows) {
     const idHard = row.getAttribute("data-id");
     const cantidad = parseInt(row.cells[4].textContent);
     const precioUnitario = parseFloat(row.cells[5].textContent);
-    const precioTotal = precioUnitario * cantidad; // Calcular el precio total
+    const precioTotal = precioUnitario * cantidad;
 
-    // Acumular el monto total de la factura
     montoTotalFactura += parseFloat(precioTotal.toFixed(2));
 
-    // Verificar stock y actualizar hardware
+    // Verificar y actualizar stock
     const stockPromise = fetch(`http://localhost:3001/hardware/${idHard}`)
       .then((response) => response.json())
       .then((hardware) => {
         const stockActual = hardware[0].UNIDADES_DISPONIBLES;
 
         if (stockActual >= cantidad) {
-          // Preparar los datos para actualizar el hardware
           const updatedHardware = {
-            ID_Hard: hardware[0].ID_Hard,
-            ID_Tipohard: hardware[0].ID_Tipohard,
-            ID_Marca: hardware[0].ID_Marca,
-            CARACTERISTICAS: hardware[0].CARACTERISTICAS,
-            PRECIO_UNITARIO: hardware[0].PRECIO_UNITARIO,
-            UNIDADES_DISPONIBLES: stockActual - cantidad, // Restar cantidad al stock
+            ...hardware[0],
+            UNIDADES_DISPONIBLES: stockActual - cantidad, // Restar cantidad
           };
 
-          // Actualizar unidades disponibles en el hardware
           return fetch(`http://localhost:3001/hardware/${idHard}`, {
             method: "PATCH",
             headers: {
@@ -323,37 +278,34 @@ async function finalizarVenta() {
             body: JSON.stringify(updatedHardware),
           });
         } else {
-          // Si no hay suficiente stock, marcar la bandera como falsa
           stockSuficiente = false;
           alert(
             `No hay suficiente stock para el hardware ID: ${idHard}. Stock actual: ${stockActual}.`
           );
-          throw new Error(`Stock insuficiente para ID: ${idHard}`); // Lanza un error si no hay suficiente stock
+          throw new Error(`Stock insuficiente para ID: ${idHard}`);
         }
       })
-      .catch((error) => console.error("Error al verificar stock:", error));
+      .catch((error) => {
+        console.error("Error al verificar stock:", error);
+        alert("Error al verificar stock. Por favor, intente nuevamente.");
+      });
 
-    // Agregar la promesa de stock al array
     promesas.push(stockPromise);
 
-    // Guardar detalles de la factura solo si hay stock suficiente
+    // Crear detalles de la factura
     const detallesFacturaPromise = stockPromise.then(() => {
-      // Preparar los datos para los detalles de la factura
-      iva = iva * 100;
       const detallesFactura = {
         NroFacv: nuevoNumeroFactura,
         IDHard: idHard,
         PrecioUnitario: precioUnitario,
         Cantidad: cantidad,
-        PrecioTotal: precioTotal,
-        IVA: iva.toFixed(4),
-        PrecioIVA: (parseFloat(precioTotal) + precioTotal * iva).toFixed(2),
+        PrecioTotal: precioTotal.toFixed(2),
+        IVA: ivaPorcentaje.toFixed(2),
+        PrecioIVA: (precioTotal * (1 + iva)).toFixed(2),
       };
-      iva = iva / 100;
 
       detallesFacturaArray.push(detallesFactura);
 
-      // Hacer la solicitud para guardar los detalles de la factura
       return fetch(`http://localhost:3001/detallefacturaventas`, {
         method: "POST",
         headers: {
@@ -363,45 +315,27 @@ async function finalizarVenta() {
       });
     });
 
-    // Agregar la promesa de detalles de factura al array
     promesas.push(detallesFacturaPromise);
   }
 
-  // Verificar si hubo problemas de stock
   if (!stockSuficiente) {
-    // Cancelar todas las operaciones si no hay suficiente stock
     alert("La venta ha sido cancelada debido a falta de stock.");
-    return; // Salir de la función
+    return;
   }
 
-  // Promesa para cancelar el pedido
-  const cancelarPedidoPromise = fetch(
-    `http://localhost:3001/pedidos/cancelar/${pedidoId.value}`,
-    {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ condicion: 2 }),
-    }
-  );
+  montoTotalFactura *= 1 + iva;
 
-  // Agregar la promesa de cancelar pedido al array
-  promesas.push(cancelarPedidoPromise);
-
-  montoTotalFactura = montoTotalFactura * (1 + iva);
   const factura = {
-    NroFacv: nuevoNumeroFactura, // Número de factura que debe ser +1 del último
-    IDCliente: idCliente, // ID del cliente extraído del select
-    IDPedido: pedidoId.value, // Debes tener la variable pedidoId definida con el ID del pedido
-    Fecha: new Date().toISOString(), // Fecha actual
-    MontoTotal: montoTotalFactura.toFixed(2), // Monto total de la factura
-    FormaDePago: document.getElementById("formaPago").value, // Obtener el método de pago
-    CantidadDeCuotas: document.getElementById("cantCuotas").value, // Obtener el número de cuotas
-    PeriodoDeCuotas: document.getElementById("tipoPeriodo").value, // Obtener el período de cuotas
+    NroFacv: nuevoNumeroFactura,
+    IDCliente: idCliente,
+    IDPedido: pedidoId.value,
+    Fecha: new Date().toISOString(),
+    MontoTotal: montoTotalFactura.toFixed(2),
+    FormaDePago: document.getElementById("formaPago").value,
+    CantidadDeCuotas: document.getElementById("cantCuotas").value,
+    PeriodoDeCuotas: document.getElementById("tipoPeriodo").value,
   };
 
-  // Hacer la solicitud para guardar la factura
   const guardarFacturaPromise = fetch(
     `http://localhost:3001/facturaventas/ventasCrear`,
     {
@@ -413,10 +347,22 @@ async function finalizarVenta() {
     }
   );
 
-  // Agregar la promesa de guardar factura al array
   promesas.push(guardarFacturaPromise);
 
-  // Esperar a que todas las promesas se completen
+  const cancelarPedidoPromise = fetch(
+    `http://localhost:3001/pedidos/cancelar/${pedidoId.value}`,
+    {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ condicion: 2 }),
+    }
+  );
+
+  promesas.push(cancelarPedidoPromise);
+
+  // Esperar a que todas las operaciones se completen
   Promise.all(promesas)
     .then(() => {
       alert("Venta finalizada exitosamente!");
@@ -428,6 +374,8 @@ async function finalizarVenta() {
       alert("Hubo un error al finalizar la venta. Verifica los detalles.");
     });
 }
+
+
 
 async function obtenerYImprimirComprobante(factura, detallesFactura) {
   const clienteId = document.getElementById("clienteId").value;
@@ -488,12 +436,11 @@ async function imprimirComprobante(factura, detallesCliente, detallesFactura) {
             <div class="detalles-pedido">
                 <h2>Detalles del Pedido</h2>
                 <p><strong>Fecha del Pedido:</strong> ${new Date(
-                  factura.Fecha
-                ).toLocaleDateString()}</p>
+    factura.Fecha
+  ).toLocaleDateString()}</p>
                 <p><strong>Forma de Pago:</strong> ${factura.FormaDePago}</p>
-                <p><strong>Cantidad de Cuotas / Cheques:</strong> ${
-                  factura.CantidadDeCuotas
-                }</p>
+                <p><strong>Cantidad de Cuotas / Cheques:</strong> ${factura.CantidadDeCuotas
+    }</p>
             </div>
             <h2>Detalles del Producto</h2>
             <table>
@@ -512,11 +459,11 @@ async function imprimirComprobante(factura, detallesCliente, detallesFactura) {
             </table>
             <p class="total">IVA: % ${parseFloat(iva).toFixed(2)}</p>   
             <p class="total">Monto: $${parseFloat(
-              factura.MontoTotal / detallesFactura[0].IVA
-            ).toFixed(2)}</p>
+      factura.MontoTotal / detallesFactura[0].IVA
+    ).toFixed(2)}</p>
             <p class="total">Monto Total + IVA: $${parseFloat(
-              factura.MontoTotal
-            ).toFixed(2)}</p>
+      factura.MontoTotal
+    ).toFixed(2)}</p>
             <div class="footer">
                 <p>¡Gracias por su compra!</p>
             </div>
@@ -590,6 +537,33 @@ async function obtenerNuevoNumeroFactura() {
     console.error("Error al obtener el número de factura:", error);
     return null;
   }
+}
+
+function comprobarCampos() {
+
+  // Captura de datos del formulario
+  let iva = document.getElementById("IVA").value;
+  const fechaVenta = document.getElementById("fechaVenta").value;
+  let cantCuotas = document.getElementById("cantCuotas").value;
+
+  iva = parseInt(iva)
+  cantCuotas = parseInt(cantCuotas)
+
+  // Validación de campos obligatorios
+  if (!fechaVenta) {
+    alert("Por favor, complete La Fecha.");
+    return false;
+  }
+
+  if (iva < 0 || isNaN(iva)) {
+    alert("Por favor, El IVA debe ser cero o mas");
+    return false;
+  }
+  if (cantCuotas < 0 || isNaN(cantCuotas)) {
+    alert("Por favor, La Cantidad de Cuotas debe ser mayor a cero");
+    return false;
+  }
+  return true
 }
 
 // Función para limpiar el formulario

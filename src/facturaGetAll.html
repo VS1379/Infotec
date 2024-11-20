@@ -1,52 +1,73 @@
 <div id="facturaSection">
-    <h1>Lista de Facturas</h1>
-    <style>
-      table {
-        width: 100%;
-        border-collapse: collapse;
-      }
-      table,
-      th,
-      td {
-        border: 1px solid black;
-      }
-      th,
-      td {
-        padding: 10px;
-        text-align: center;
-      }
-      th {
-        background-color: #f2f2f2;
-      }
-      button {
-          display: flex;
-          border-radius: 2px;
-          margin: auto;
-          background-color: red;
-          color: black  ;
-      }
-    </style>
-    <table>
-      <thead>
-        <tr>
-          <th><h3>Item</h4></th>
-          <th><h3>Nro Factura</h4></th>
-          <th><h3>Pedido</h3></th>
-          <th><h3>Cliente</h3></th>
-          <th><h3>Fecha y Hora</h3></th>
-          <th><h3>Monto Total</h3></th>
-          <th><h3>Forma De Pago</h3></th>
-          <th><h3>Cantidad De Cuotas</h3></th>
-          <th><h3>Periodo de Cuotas</h3></th>
-        </tr>
-      </thead>
-      <tbody id="facturaContainer">
-        <!-- facturas aca -->
-      </tbody>
-    </table>
-  </div>
-  <br>
-      <a href="facturaIndex.html">Volver a Pedidos</a> 
-      <br/>
-  <script src="scriptsFacturaGetAll.js"></script>
-  
+  <h1>Lista de Facturas</h1>
+  <style>
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    table,
+    th,
+    td {
+      border: 1px solid black;
+    }
+
+    th,
+    td {
+      padding: 10px;
+      text-align: center;
+    }
+
+    th {
+      background-color: #f2f2f2;
+    }
+
+    button {
+      display: flex;
+      border-radius: 2px;
+      margin: auto;
+      background-color: red;
+      color: black;
+    }
+  </style>
+  <table>
+    <thead>
+      <tr>
+        <th>
+          <h3>Item</h4>
+        </th>
+        <th>
+          <h3>Nro Factura</h4>
+        </th>
+        <th>
+          <h3>Pedido</h3>
+        </th>
+        <th>
+          <h3>Cliente</h3>
+        </th>
+        <th>
+          <h3>Fecha y Hora</h3>
+        </th>
+        <th>
+          <h3>Monto Total</h3>
+        </th>
+        <th>
+          <h3>Forma De Pago</h3>
+        </th>
+        <th>
+          <h3>Cantidad De Cuotas</h3>
+        </th>
+        <th>
+          <h3>Periodo de Cuotas</h3>
+        </th>
+      </tr>
+    </thead>
+    <tbody id="facturaContainer">
+      <!-- facturas aca -->
+    </tbody>
+  </table>
+</div>
+<br>
+<a href="facturaIndex.html">Volver a Factura</a>
+<br />
+<script src="scriptsFacturaGetAll.js"></script>

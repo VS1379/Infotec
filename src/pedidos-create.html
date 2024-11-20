@@ -1,128 +1,124 @@
 <!DOCTYPE html>
 <html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Pedido de Hardware</title>
-    <style>
-      table {
-        width: 100%;
-        border-collapse: collapse;
-      }
-      table,
-      th,
-      td {
-        border: 1px solid black;
-      }
-      th,
-      td {
-        padding: 10px;
-        text-align: left;
-      }
-      th {
-        background-color: #f2f2f2;
-      }
-    </style>
-  </head>
-  <body>
-    <h2>Registrar Pedido de Hardware</h2>
-    <form id="formPedido">
-      <!-- Información del Pedido -->
-      <fieldset>
-        <legend>Datos del Pedido</legend>
-        <label for="cliente">Cliente:</label>
-        <select id="cliente" required>
-          <option value="">Seleccione un cliente</option>
-        </select>
-        <a href="clientes.html" target="_blank">Agregar Cliente</a>
-        <br /><br />
 
-        <legend>Información del Cliente</legend>
-        <p id="infoCliente" style="display: none"></p>
-        <label for="fechaPedido">Fecha del Pedido:</label>
-        <input type="datetime-local" id="fechaPedido" required />
-        <br /><br />
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pedido de Hardware</title>
+  <style>
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
 
-        <label for="tipoPedido">Tipo de Pedido:</label>
-        <select id="tipoPedido" required>
-          <option value="1">Presupuesto</option>
-          <option value="2">Licitación</option>
-          <option value="3">Compra Directa</option>
-        </select>
-      </fieldset>
-      <br />
+    table,
+    th,
+    td {
+      border: 1px solid black;
+    }
 
-      <!-- Selección del Hardware -->
-      <fieldset>
-        <legend>Selección del Hardware</legend>
-        <label for="tipoHardware">Tipo de Hardware:</label>
-        <select id="tipoHardware" required>
-          <option value="">Seleccione un tipo</option>
-        </select>
-        <input type="hidden" id="idHardwareSeleccionado" />
-        <br /><br />
+    th,
+    td {
+      padding: 10px;
+      text-align: left;
+    }
 
-        <label for="marcaHardware">Marca del Hardware:</label>
-        <select id="marcaHardware" required>
-          <option value="">Seleccione una marca</option>
-        </select>
-        <br /><br />
+    th {
+      background-color: #f2f2f2;
+    }
+  </style>
+</head>
 
-        <label for="hardware">Hardware:</label>
-        <select id="hardware" required>
-          <option value="">Seleccione el hardware</option>
-        </select>
-        <br /><br />
+<body>
+  <h2>Registrar Pedido de Hardware</h2>
+  <form id="formPedido">
+    <!-- Información del Pedido -->
+    <fieldset>
+      <legend>Datos del Pedido</legend>
+      <label for="cliente">Cliente:</label>
+      <select id="cliente" required>
+      </select>
+      <a href="clientes.html" target="_blank">Agregar Cliente</a>
+      <br /><br />
 
-        <label for="cantidad">Cantidad:</label>
-        <input
-          type="number"
-          id="cantidad"
-          required
-          min="1"
-          pattern="\d+"
-          title="Ingrese un número positivo"
-        />
-        <br /><br />
+      <legend>Información del Cliente</legend>
+      <p id="infoCliente" style="display: none"></p>
+      <label for="fechaPedido">Fecha del Pedido:</label>
+      <input type="datetime-local" id="fechaPedido" required />
+      <br /><br />
 
-        <button type="button" onclick="agregarDetalle()">
-          Agregar al Pedido
-        </button>
-      </fieldset>
-      <br />
-
-      <fieldset>
-        <legend>Detalles del Pedido</legend>
-        <table id="detallesPedido">
-          <thead>
-            <tr>
-              <th>Tipo</th>
-              <th>Marca</th>
-              <th>Características</th>
-              <th>Precio Unitario</th>
-              <th>Cantidad</th>
-              <th>Stock</th>
-              <th>Estado</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            <!-- Los detalles del pedido se mostrarán aquí -->
-          </tbody>
-        </table>
-      </fieldset>
-      <br />
-
-      <p style="display: none">
-        <span id="idMarca">1</span>
-        <span id="descripcion">Descripción del pedido</span>
-      </p>
-
-      <button type="submit">Finalizar Pedido</button>
-    </form>
+      <label for="tipoPedido">Tipo de Pedido:</label>
+      <select id="tipoPedido" required>
+        <option value="1">Presupuesto</option>
+        <option value="2">Licitación</option>
+        <option value="3">Compra Directa</option>
+      </select>
+    </fieldset>
     <br />
-    <a href="pedidos-index.html">Volver a Pedidos</a>
+
+    <!-- Selección del Hardware -->
+    <fieldset>
+      <legend>Selección del Hardware</legend>
+      <label for="tipoHardware">Tipo de Hardware:</label>
+      <select id="tipoHardware" required>
+      </select>
+      <input type="hidden" id="idHardwareSeleccionado" />
+      <br /><br />
+
+      <label for="marcaHardware">Marca del Hardware:</label>
+      <select id="marcaHardware" required>
+      </select>
+      <br /><br />
+
+      <label for="hardware">Hardware:</label>
+      <select id="hardware" required>
+        <option value="">Seleccione un Hardware</option>
+      </select>
+      <br /><br />
+
+      <label for="cantidad">Cantidad:</label>
+      <input type="number" id="cantidad" min="1" pattern="\d+" title="Ingrese un número positivo" />
+      <br /><br />
+
+      <button type="button" onclick="agregarDetalle()">
+        Agregar al Pedido
+      </button>
+    </fieldset>
     <br />
-    <script src="scriptsPedidos.js"></script>
-  </body>
+
+    <fieldset>
+      <legend>Detalles del Pedido</legend>
+      <table id="detallesPedido">
+        <thead>
+          <tr>
+            <th>Tipo</th>
+            <th>Marca</th>
+            <th>Características</th>
+            <th>Precio Unitario</th>
+            <th>Cantidad</th>
+            <th>Stock</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <!-- Los detalles del pedido se mostrarán aquí -->
+        </tbody>
+      </table>
+    </fieldset>
+    <br />
+
+    <p style="display: none">
+      <span id="idMarca">1</span>
+      <span id="descripcion">Descripción del pedido</span>
+    </p>
+
+    <button type="submit">Finalizar Pedido</button>
+  </form>
+  <br />
+  <a href="pedidos-index.html">Volver a Pedidos</a>
+  <br />
+  <script src="scriptsPedidos.js"></script>
+</body>
+
 </html>
