@@ -105,7 +105,7 @@ export class pedidoController {
       if (!pedido || pedido.condicion === 1) {
         return res
           .status(400)
-          .json({ message: "No se puede cancelar el pedido" });
+          .json({ message: "No se puede Cancelar el pedido" });
       }
       // Actualizar la condición a "Cancelado"
       await pedidoModel.actualizarCondicion(numeroPedido, 2);
@@ -113,7 +113,28 @@ export class pedidoController {
       res.json({ message: "Pedido cancelado correctamente" });
     } catch (error) {
       console.error(error);
-      res.status(500).json({ message: "Error al cancelar el pedido" });
+      res.status(500).json({ message: "Error al Cancelar el pedido" });
+    }
+  }
+
+  static async presupuestar(req, res) {
+    try {
+      const { numeroPedido } = req.params;
+
+      const pedido = await pedidoModel.getById(numeroPedido);
+
+      if (!pedido || pedido.condicion === 2) {
+        return res
+          .status(400)
+          .json({ message: "No se puede Presupuestar el pedido" });
+      }
+      // Actualizar la condición a "Cancelado"
+      await pedidoModel.actualizarCondicion(numeroPedido, 1);
+
+      res.json({ message: "Pedido cancelado correctamente" });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Error al Presupuestar el pedido" });
     }
   }
 }

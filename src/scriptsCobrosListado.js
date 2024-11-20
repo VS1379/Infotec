@@ -1,6 +1,11 @@
 document.addEventListener("DOMContentLoaded", function () {
   cargarCobros();
+  cargarFechaHoy()
 });
+
+function cargarFechaHoy() {
+  document.getElementById("fechaHoy").value = new Date().toISOString().split('T')[0];
+}
 
 async function cargarCobros() {
   try {
@@ -33,7 +38,9 @@ async function cargarCobros() {
     cobrosContainer.innerHTML = `<h1>Cobros Realizados</h1>`;
 
     for (const [tipoPago, cobros] of Object.entries(cobrosPorTipo)) {
-      cobrosContainer.innerHTML += `<h2>Forma de pago: ${tipoPago}</h2>
+      cobrosContainer.innerHTML += `
+      <fieldset>
+      <h2>Forma de pago: ${tipoPago}</h2>
       <table>
         <thead>
           <tr>
@@ -58,7 +65,9 @@ async function cargarCobros() {
           })
           .join("")}
         </tbody>
-      </table>`;
+      </table>
+      </fieldset>
+      <br>`;
     }
 
     cobrosContainer.innerHTML += `<h3>Monto Total Cobrado: ${montoTotalCobrado.toFixed(

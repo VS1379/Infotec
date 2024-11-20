@@ -32,3 +32,6 @@ pedidosRouter.delete("/:id", pedidoController.eliminar);
 
 // Cancelar un pedido
 pedidosRouter.patch("/cancelar/:numeroPedido", pedidoController.cancelar);
+
+// Presupuestar un pedido
+pedidosRouter.patch("/presupuestar/:numeroPedido", pedidoController.presupuestar);

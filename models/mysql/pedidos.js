@@ -65,7 +65,7 @@ export class pedidoModel {
     try {
       const [result] = await connection.query(
         "INSERT INTO pedidos (IDCliente, FechaHora, Condicion, TipoPedido) VALUES (?, ?, ?, ?)",
-        [IDCliente, FechaHora, condicion, TipoPedido]
+        [IDCliente, FechaHora, 0, TipoPedido]
       );
       const [lastIdResult] = await connection.query(
         "SELECT LAST_INSERT_ID() AS IDPedido"

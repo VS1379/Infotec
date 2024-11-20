@@ -222,7 +222,7 @@ function registrarCobro() {
   })
     .then((response) => response.json())
     .then((data) => {
-      alert(data.mensaje);
+      alert("Cobro Realizado con Exito");
       actualizarCuotas(numeroFactura);
     })
     .catch((error) => {
@@ -240,8 +240,9 @@ function actualizarCuotas(numeroFactura) {
   })
     .then((response) => response.json())
     .then((data) => {
-      alert(data.mensaje);
+      alert("Cuota Descontada");
       document.getElementById("formCobro").reset();
+      location.reload()
     })
     .catch((error) => {
       console.error("Error al actualizar las cuotas:", error);

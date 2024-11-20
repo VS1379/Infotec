@@ -3,7 +3,7 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 function cargarPedidos() {
-  fetch("http://localhost:3001/pedidos")
+  fetch("http://localhost:3001/pedidos/registrado")
     .then((response) => response.json())
     .then((data) => {
       const pedidoSelect = document.getElementById("pedido");
@@ -79,15 +79,26 @@ function cargarDetallesPedido(pedidoId) {
                 precioTotal.textContent =
                   parseFloat(item.PRECIO_UNITARIO).toFixed(2) *
                   detalle.Cantidad.toFixed(2);
-                precioTotal.textContent = parseFloat(
-                  precioTotal.textContent
-                ).toFixed(2);
+                precioTotal.textContent =
+                  (parseFloat(item.PRECIO_UNITARIO) *
+                    detalle.Cantidad).toFixed(2);
 
                 const modificarCell = row.insertCell(7);
                 const eliminarCell = row.insertCell(8);
 
-                tipoCell.textContent = item.ID_Tipohard;
-                marcaCell.textContent = item.ID_Marca;
+                cargarMarcasYTipos(item.ID_Marca, item.ID_Tipohard)
+                  .then((datos) => {
+                    if (datos) {
+                      tipoCell.textContent = datos.tipo
+                      marcaCell.textContent = datos.marca
+                    } else {
+                      console.error("No se pudieron obtener los datos.");
+                    }
+                  })
+                  .catch((error) => {
+                    console.error("Error al cargar marcas o tipos de hardware:", error);
+                  });
+
                 caracteristicasCell.textContent = item.CARACTERISTICAS;
 
                 precioCell.textContent =
@@ -246,29 +257,17 @@ async function imprimirPresupuesto() {
       .then((response) => response.json())
       .then((hardware) => {
         const stockActual = hardware[0].UNIDADES_DISPONIBLES;
-
-        if (stockActual >= cantidad) {
-          // Preparar los datos para actualizar el hardware
-          const updatedHardware = {
-            ID_Hard: hardware[0].ID_Hard,
-            ID_Tipohard: hardware[0].ID_Tipohard,
-            ID_Marca: hardware[0].ID_Marca,
-            CARACTERISTICAS: hardware[0].CARACTERISTICAS,
-            PRECIO_UNITARIO: hardware[0].PRECIO_UNITARIO,
-            UNIDADES_DISPONIBLES: stockActual - cantidad, // Restar cantidad al stock
-          };
-        } else {
-          // Si no hay suficiente stock, marcar la bandera como falsa
-          stockSuficiente = false;
-          alert(
-            `¡ Advertencia ! \n No hay suficiente stock para el hardware ID: ${idHard}. Stock actual: ${stockActual}.`
-          );
-          throw new Error(`Stock insuficiente para ID: ${idHard}`); // Lanza un error si no hay suficiente stock
-        }
+        const updatedHardware = {
+          ID_Hard: hardware[0].ID_Hard,
+          ID_Tipohard: hardware[0].ID_Tipohard,
+          ID_Marca: hardware[0].ID_Marca,
+          CARACTERISTICAS: hardware[0].CARACTERISTICAS,
+          PRECIO_UNITARIO: hardware[0].PRECIO_UNITARIO,
+          UNIDADES_DISPONIBLES: stockActual - cantidad,
+        };
       })
       .catch((error) => console.error("Error al verificar stock:", error));
 
-    // Guardar detalles del presupuesto solo si hay stock suficiente
     iva = iva * 100;
     const detallesFactura = {
       IDHard: idHard,
@@ -283,13 +282,6 @@ async function imprimirPresupuesto() {
     detallesFacturaArray.push(detallesFactura);
   }
 
-  // Verificar si hubo problemas de stock
-  if (!stockSuficiente) {
-    // Cancelar todas las operaciones si no hay suficiente stock
-    alert("La venta ha sido cancelada debido a falta de stock.");
-    return; // Salir de la función
-  }
-
   montoTotalFactura = montoTotalFactura * (1 + iva);
   const factura = {
     NroFacv: 0, // Número de factura que debe ser +1 del último
@@ -301,7 +293,23 @@ async function imprimirPresupuesto() {
     CantidadDeCuotas: document.getElementById("cantCuotas").value, // Obtener el número de cuotas
   };
 
-  // Esperar a que todas las promesas se completen
+  fetch(`http://localhost:3001/pedidos/presupuestar/${numeroPedido}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  })
+    .then((response) => {
+      if (response.ok) {
+        alert("Pedido Presupuestado Exitosamente.");
+        cargarPedidos();
+      } else {
+        response.json().then((data) => {
+          alert(data.error || "No se pudo Presupuestar el pedido.");
+        });
+      }
+    })
+    .catch((error) => console.error("Error al Presupuestar el pedido:", error));
 
   alert("Presupuesto Finalizado Exitosamente!");
   obtenerYImprimirComprobante(factura, detallesFacturaArray);
@@ -376,9 +384,8 @@ async function imprimirComprobante(factura, detallesCliente, detallesFactura) {
                 <h2>Detalles del Pedido</h2>
                 <p><strong>Valido Hasta:</strong> ${factura.Fecha}</p>
                 <p><strong>Forma de Pago:</strong> ${factura.FormaDePago}</p>
-                <p><strong>Cantidad de Cuotas / Cheques:</strong> ${
-                  factura.CantidadDeCuotas || 0
-                }</p>
+                <p><strong>Cantidad de Cuotas / Cheques:</strong> ${factura.CantidadDeCuotas || 0
+    }</p>
             </div>
             <h2>Detalles del Producto</h2>
             <table>
@@ -397,11 +404,11 @@ async function imprimirComprobante(factura, detallesCliente, detallesFactura) {
             </table>
             <p class="total">IVA: % ${parseFloat(iva).toFixed(2)}</p>   
             <p class="total">Monto: $${parseFloat(
-              factura.MontoTotal / detallesFactura[0].IVA
-            ).toFixed(2)}</p>
+      factura.MontoTotal / detallesFactura[0].IVA
+    ).toFixed(2)}</p>
             <p class="total">Monto Total + IVA: $${parseFloat(
-              factura.MontoTotal
-            ).toFixed(2)}</p>
+      factura.MontoTotal
+    ).toFixed(2)}</p>
             <div class="footer">
                 <p>¡Gracias por tenernos en cuenta!</p>
             </div>
@@ -478,7 +485,61 @@ async function obtenerNumeroPresupuesto() {
   }
 }
 
+function comprobarCampos() {
+
+  // Captura de datos del formulario
+  let iva = document.getElementById("IVA").value;
+  const fechaVenta = document.getElementById("fechaVenta").value;
+  let cantCuotas = document.getElementById("cantCuotas").value;
+
+  iva = parseInt(iva)
+  cantCuotas = parseInt(cantCuotas)
+
+  // Validación de campos obligatorios
+  if (!fechaVenta) {
+    alert("Por favor, complete La Fecha.");
+    return false;
+  }
+
+  if (iva < 0 || isNaN(iva)) {
+    alert("Por favor, El IVA debe ser cero o mas");
+    return false;
+  }
+  if (cantCuotas < 0 || isNaN(cantCuotas)) {
+    alert("Por favor, La Cantidad de Cuotas debe ser mayor a cero");
+    return false;
+  }
+  return true
+}
+
+async function cargarMarcasYTipos(
+  idMarca,
+  idTipoHard,
+) {
+  try {
+    // Fetch para obtener marcas
+    const marcasResponse = await fetch(`http://localhost:3001/marca/${idMarca}`);
+    const marca = await marcasResponse.json();
+
+    // Fetch para obtener tipos de hardware
+    const tiposResponse = await fetch(`http://localhost:3001/tipohardware/${idTipoHard}`);
+    const tipo = await tiposResponse.json();
+
+    const datos = {
+      marca: marca[0].DESCRIPCION,
+      tipo: tipo[0].DESCRIPCION
+    }
+
+    return datos
+
+  } catch (error) {
+    console.error("Error al cargar marcas o tipos de hardware:", error);
+  }
+}
+
 // Función para limpiar el formulario
 function limpiarFormulario() {
-  //location.reload();
+  setTimeout(() => {
+    location.reload();
+  }, 3000);
 }

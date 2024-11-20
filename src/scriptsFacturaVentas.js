@@ -1,8 +1,21 @@
 document.addEventListener("DOMContentLoaded", function () {
   cargarPedidos();
+  cargarNumeroFactura()
 });
 
+// Funcion para obtener el Nro de Factura
+async function cargarNumeroFactura() {
+  const nuevoNumeroFactura = await obtenerNuevoNumeroFactura();
+  if (nuevoNumeroFactura === null) {
+    alert("Error al obtener el número de factura.");
+    return;
+  }
+  document.getElementById("numeroFactura").value = nuevoNumeroFactura || 0
+}
+
+// Funcion para cargar el Pedido
 function cargarPedidos() {
+
   fetch("http://localhost:3001/pedidos")
     .then((response) => response.json())
     .then((data) => {
@@ -48,6 +61,7 @@ function cargarPedidos() {
     .catch((error) => console.error("Error al cargar los pedidos:", error));
 }
 
+// Funcion para cargar los Detalles del Pedido
 function cargarDetallesPedido(pedidoId) {
   fetch(`http://localhost:3001/detallepedidos/${pedidoId}`)
     .then((response) => response.json())
@@ -74,17 +88,27 @@ function cargarDetallesPedido(pedidoId) {
                 const caracteristicasCell = row.insertCell(3);
                 const cantidadCell = row.insertCell(4);
                 const precioCell = row.insertCell(5);
-
                 const precioTotal = row.insertCell(6);
                 precioTotal.textContent =
-                  parseFloat(item.PRECIO_UNITARIO).toFixed(2) *
-                  detalle.Cantidad;
+                  (parseFloat(item.PRECIO_UNITARIO) *
+                    detalle.Cantidad).toFixed(2);
 
                 const modificarCell = row.insertCell(7);
                 const eliminarCell = row.insertCell(8);
 
-                tipoCell.textContent = item.ID_Tipohard;
-                marcaCell.textContent = item.ID_Marca;
+                cargarMarcasYTipos(item.ID_Marca, item.ID_Tipohard)
+                  .then((datos) => {
+                    if (datos) {
+                      tipoCell.textContent = datos.tipo
+                      marcaCell.textContent = datos.marca
+                    } else {
+                      console.error("No se pudieron obtener los datos.");
+                    }
+                  })
+                  .catch((error) => {
+                    console.error("Error al cargar marcas o tipos de hardware:", error);
+                  });
+
                 caracteristicasCell.textContent = item.CARACTERISTICAS;
 
                 precioCell.textContent =
@@ -94,16 +118,16 @@ function cargarDetallesPedido(pedidoId) {
 
                 cantidadCell.textContent = detalle.Cantidad;
 
-                // boton eliminar
+                // Botón eliminar (solo modifica la tabla)
                 const eliminarBtn = document.createElement("button");
                 eliminarBtn.textContent = "Eliminar";
                 eliminarBtn.onclick = function () {
-                  eliminarItem(detalle.IDHard, row);
-                  cargarMontoIvaMontoTotal();
+                  grillaHardware.removeChild(row); // Eliminar fila de la tabla
+                  cargarMontoIvaMontoTotal(); // Recalcular montos
                 };
                 eliminarCell.appendChild(eliminarBtn);
 
-                // boton modificar
+                // Botón modificar (verifica stock y modifica en el HTML)
                 const modificarBtn = document.createElement("button");
                 modificarBtn.type = "button";
                 modificarBtn.textContent = "Modificar";
@@ -120,41 +144,38 @@ function cargarDetallesPedido(pedidoId) {
                   cantidadCell.appendChild(inputCantidad);
                   inputCantidad.focus();
 
-                  inputCantidad.onblur = function () {
+                  inputCantidad.onblur = async function () {
                     const nuevaCantidad = parseInt(inputCantidad.value);
+
                     if (!isNaN(nuevaCantidad) && nuevaCantidad > 0) {
-                      cantidadCell.textContent = nuevaCantidad;
+                      // Verificar stock antes de aplicar el cambio
+                      const suficienteStock = await verificarStock(
+                        detalle.IDHard,
+                        nuevaCantidad
+                      );
+                      if (suficienteStock) {
+                        cantidadCell.textContent = nuevaCantidad;
 
-                      // Recalcular el precio total de la fila
-                      const precioUnitario = parseFloat(precioCell.textContent);
-                      const nuevoPrecioTotal = (
-                        precioUnitario * nuevaCantidad
-                      ).toFixed(2);
-                      precioTotal.textContent = nuevoPrecioTotal;
-
-                      // Actualizar el total general
-                      cargarMontoIvaMontoTotal();
-
-                      try {
-                        const response = fetch(
-                          `
-                          http://localhost:3001/detallePedidos/modificarCantidad/${pedidoId}/`,
-                          {
-                            method: "PATCH",
-                            headers: {
-                              "Content-Type": "application/json",
-                            },
-                            body: JSON.stringify({
-                              IDHard: detalle.IDHard,
-                              CANTIDAD: nuevaCantidad,
-                            }),
-                          }
+                        // Recalcular el precio total de la fila
+                        const precioUnitario = parseFloat(
+                          precioCell.textContent
                         );
-                      } catch (error) {
-                        console.error(error);
+                        const nuevoPrecioTotal = (
+                          precioUnitario * nuevaCantidad
+                        ).toFixed(2);
+                        precioTotal.textContent = nuevoPrecioTotal;
+
+                        // Actualizar el total general
+                        cargarMontoIvaMontoTotal();
+                      } else {
+
+                        alert(
+                          `No hay suficiente stock para el hardware: ${item.CARACTERISTICAS}.`
+                        );
+                        cantidadCell.textContent = detalle.Cantidad; // Restaurar cantidad original
                       }
                     } else {
-                      cantidadCell.textContent = detalle.Cantidad;
+                      cantidadCell.textContent = detalle.Cantidad; // Restaurar cantidad original
                     }
                     modificarBtn.dataset.editing = "false";
                   };
@@ -167,7 +188,8 @@ function cargarDetallesPedido(pedidoId) {
                   };
                 };
                 modificarCell.appendChild(modificarBtn);
-                cargarMontoIvaMontoTotal();
+
+                cargarMontoIvaMontoTotal(); // Recalcular montos iniciales
               });
               cargarMontoIvaMontoTotal();
             } else {
@@ -183,6 +205,23 @@ function cargarDetallesPedido(pedidoId) {
     .catch((error) =>
       console.error("Error al cargar detalles del pedido:", error)
     );
+}
+
+async function verificarStock(idHardware, nuevaCantidad) {
+  try {
+    const response = await fetch(`http://localhost:3001/hardware/${idHardware}`);
+    const hardware = await response.json();
+    if (Array.isArray(hardware) && hardware.length > 0) {
+      const stockActual = hardware[0].UNIDADES_DISPONIBLES;
+      return stockActual >= nuevaCantidad;
+    } else {
+      console.error("Error: hardware no encontrado o vacío.");
+      return false;
+    }
+  } catch (error) {
+    console.error("Error al verificar stock:", error);
+    return false;
+  }
 }
 
 function eliminarItem(idHard, row) {
@@ -233,9 +272,9 @@ async function finalizarVenta() {
     return;
   }
 
-  const nuevoNumeroFactura = await obtenerNuevoNumeroFactura();
-  if (nuevoNumeroFactura === null) {
-    alert("Error al obtener el número de factura.");
+  const detallesTabla = document.getElementById("detallesVenta").querySelector("tbody");
+  if (detallesTabla.rows.length === 0) {
+    alert("Debe haber al menos un producto en la Factura para finalizar la venta.");
     return;
   }
 
@@ -250,10 +289,29 @@ async function finalizarVenta() {
   let montoTotalFactura = 0;
   let stockSuficiente = true;
 
+  const stockDisponible = await comprobarStock(detallesTable);
+  if (!stockDisponible) {
+    alert("La venta ha sido cancelada debido a falta de stock.");
+    return;
+  }
+
+  const nuevoNumeroFactura = await obtenerNuevoNumeroFactura();
+  if (nuevoNumeroFactura === null) {
+    alert("Error al obtener el número de factura.");
+    return;
+  }
+
+
   for (let row of detallesTable.rows) {
     const idHard = row.getAttribute("data-id");
     const cantidad = parseInt(row.cells[4].textContent);
     const precioUnitario = parseFloat(row.cells[5].textContent);
+
+    if (!idHard || !cantidad || isNaN(precioUnitario)) {
+      console.warn(`Fila ignorada por datos incompletos: ID ${idHard}`);
+      continue;
+    }
+
     const precioTotal = precioUnitario * cantidad;
 
     montoTotalFactura += parseFloat(precioTotal.toFixed(2));
@@ -296,12 +354,12 @@ async function finalizarVenta() {
     const detallesFacturaPromise = stockPromise.then(() => {
       const detallesFactura = {
         NroFacv: nuevoNumeroFactura,
-        IDHard: idHard,
+        IDHard: parseInt(idHard),
         PrecioUnitario: precioUnitario,
         Cantidad: cantidad,
-        PrecioTotal: precioTotal.toFixed(2),
+        PrecioTotal: parseFloat(precioTotal.toFixed(2)),
         IVA: ivaPorcentaje.toFixed(2),
-        PrecioIVA: (precioTotal * (1 + iva)).toFixed(2),
+        PrecioIVA: parseFloat((precioTotal * (1 + iva)).toFixed(2)),
       };
 
       detallesFacturaArray.push(detallesFactura);
@@ -374,8 +432,6 @@ async function finalizarVenta() {
       alert("Hubo un error al finalizar la venta. Verifica los detalles.");
     });
 }
-
-
 
 async function obtenerYImprimirComprobante(factura, detallesFactura) {
   const clienteId = document.getElementById("clienteId").value;
@@ -566,7 +622,75 @@ function comprobarCampos() {
   return true
 }
 
-// Función para limpiar el formulario
+// Funcion para comprobar el stock antes de finalizar la venta
+async function comprobarStock(detallesTable) {
+  const stockPromises = [];
+
+  // Recorrer todas las filas para verificar el stock
+  for (let row of detallesTable.rows) {
+    const idHard = row.getAttribute("data-id");
+    const cantidad = parseInt(row.cells[4].textContent);
+
+    // Agregar promesas de verificación a la lista
+    stockPromises.push(
+      fetch(`http://localhost:3001/hardware/${idHard}`)
+        .then((response) => response.json())
+        .then((hardware) => {
+          const stockActual = hardware[0].UNIDADES_DISPONIBLES;
+
+          if (stockActual < cantidad) {
+            alert(
+              `No hay suficiente stock para el hardware: ${hardware[0].CARACTERISTICAS}. \nStock actual: ${stockActual}.`
+            );
+            return false; // Indicar que no hay suficiente stock
+          }
+          return true; // Stock suficiente para este ítem
+        })
+        .catch((error) => {
+          console.error("Error al verificar stock:", error);
+          alert(
+            `Error al verificar stock del hardware ID: ${idHard}. Intente nuevamente.`
+          );
+          return false; // Considerar como falta de stock en caso de error
+        })
+    );
+  }
+
+  // Esperar a que todas las promesas se resuelvan
+  const stockResults = await Promise.all(stockPromises);
+
+  // Si alguna verificación falló, devolver false
+  return stockResults.every((result) => result === true);
+}
+
+async function cargarMarcasYTipos(
+  idMarca,
+  idTipoHard,
+) {
+  try {
+    // Fetch para obtener marcas
+    const marcasResponse = await fetch(`http://localhost:3001/marca/${idMarca}`);
+    const marca = await marcasResponse.json();
+
+    // Fetch para obtener tipos de hardware
+    const tiposResponse = await fetch(`http://localhost:3001/tipohardware/${idTipoHard}`);
+    const tipo = await tiposResponse.json();
+
+    const datos = {
+      marca: marca[0].DESCRIPCION,
+      tipo: tipo[0].DESCRIPCION
+    }
+
+    return datos
+
+  } catch (error) {
+    console.error("Error al cargar marcas o tipos de hardware:", error);
+  }
+}
+
+// Funcion para limpiar el formulario
 function limpiarFormulario() {
-  //location.reload();
+  setTimeout(() => {
+    location.reload();
+  }, 3000);
 }
