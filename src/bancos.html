@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bancos</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <header>
+        <h1>Bancos</h1>
+        <button class="btn volver">
+            <a href="index.html">Volver al inicio</a>
+        </button>
+    </header>
+
+    <section id="tipoHardwareMenu" class="menu">
+        <h2>Tipo de Hardware</h2>
+        <h3>Consultar Tipo de Hardware</h3>
+        <form id="getAllTipoHardwareForm">
+            <button type="submit">Obtener Todo</button>
+        </form>
+        <h3>Consultar Tipo de Hardware Por Un Campo</h3>
+        <form id="getTipoHardwareByField">
+            <label for="field">Buscar por:</label>
+            <select id="fieldTipoHardware" name="field">
+                <option value="ID_Tipohard">ID</option>
+                <option value="DESCRIPCION">Descripción</option>
+            </select>
+            <label for="data">Valor:</label>
+            <input type="text" id="dataTipoHardware" name="data" required />
+            <button type="submit">Buscar</button>
+        </form>
+        <div id="tipoHardwareResponse"></div>
+        <h3>Agregar Tipo de Hardware</h3>
+        <form id="createTipoHardwareForm">
+            <label>Tipo del Hardware: <input type="text" id="descripcionTipoHardware" required maxlength="40"
+                    pattern="[A-Za-z0-9\s]{1,40}" title="Máximo 40 caracteres alfanuméricos"></label>
+            <button type="submit">Agregar Tipo de Hardware</button>
+        </form>
+        <h3>Actualizar Tipo de Hardware</h3>
+        <form id="updateTipoHardFormById">
+            <label>ID: <input type="number" id="updateIdTipoHardware" required min="1" max="99"></label>
+            <button type="submit" id="hardwareBuscarButton">BUSCAR</button>
+            <button type="reset"><a href="hardware.html"
+                    style="text-decoration: none; color: white;">CANCELAR</a></button>
+            <div id="dontExist"></div>
+        </form>
+        <form id="updateTipoHardForm" hidden>
+            <label>Descripción del Tipo de Hardware: <input type="text" id="updateDescripcionTipoHardware"
+                    required></label>
+            <button type="submit">Actualizar Tipo de Hardware</button>
+        </form>
+        <h3>Eliminar Tipo de Hardware</h3>
+        <form id="deleteTipoHardwareForm">
+            <label>ID: <input type="number" id="deleteIdTipoHardware" required min="1" max="999"></label>
+            <button onclick="eliminarTipoHardware()">Eliminar Tipo Hard</button>
+        </form>
+        <a href="hardware.html">Volver</a>
+    </section>
+
+    <script src="scriptsHardware.js"></script>
+</body>
+
+</html>

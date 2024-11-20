@@ -189,6 +189,7 @@ async function cargarBancos() {
 }
 
 function registrarCobro() {
+  if (!comprobarCampos()) return;
   const numeroFactura = document.getElementById("numeroFactura").value;
   const fecha = document.getElementById("fechaCobro").value;
   let formaPago = document.getElementById("formaPago").value;
@@ -248,4 +249,34 @@ function actualizarCuotas(numeroFactura) {
       console.error("Error al actualizar las cuotas:", error);
       alert("Error al actualizar las cuotas.");
     });
+}
+
+function comprobarCampos() {
+
+  // Captura de datos del formulario
+  let monto = document.getElementById("monto").value;
+  const fechaCobro = document.getElementById("fechaCobro").value;
+  let nroCheuque = document.getElementById("numeroCheque").value
+
+  parseFloat(monto)
+  parseInt(nroCheuque)
+  console.log(monto);
+  console.log(nroCheuque);
+
+
+  // Validación de campos obligatorios
+  if (!fechaCobro) {
+    alert("Por favor, complete La Fecha.");
+    return false;
+  }
+
+  if (monto < 0 || isNaN(monto)) {
+    alert("Por favor, El Monto debe ser cero o mas");
+    return false;
+  }
+
+  if (nroCheuque < 0 || isNaN(nroCheuque)) {
+    document.getElementById("numeroCheque").value = 0
+  }
+  return true
 }

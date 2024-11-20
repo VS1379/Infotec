@@ -3,5 +3,10 @@ import { bancoController } from '../controllers/bancos.js';
 
 export const bancoRouter = Router();
 
-// Obtener todos los clientes
+// Obtener todos los bancos
 bancoRouter.get('/', bancoController.getAll);
+
+bancoRouter.post('/', bancoController.create);
+
+bancoRouter.delete('/', bancoController.delete);
+

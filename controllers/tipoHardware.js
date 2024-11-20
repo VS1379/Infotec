@@ -47,6 +47,7 @@ export class tipoHardwareController {
     }
   }
 
+
   static async eliminar(req, res) {
     try {
       const { id_tipohard } = req.params;
