@@ -16,7 +16,7 @@ Sigue estos pasos para configurar el proyecto en tu máquina local:
 1. **Clona el repositorio:**
 
    ```bash
-   git clone <URL_DEL_REPOSITORIO>
+   git clone (https://github.com/VS1379/Infotec)
    cd infotec
     npm install
 
