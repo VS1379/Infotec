@@ -1,0 +1,116 @@
+/* Global styles */
+body {
+  font-family: Arial, sans-serif;
+  line-height: 1.6;
+  margin: 20px;
+  background-color: #f9f9f9;
+  color: #333;
+}
+
+h1,
+h2,
+h3 {
+  text-align: center;
+  color: #0056b3;
+}
+
+input[type="date"] {
+  font-size: 16px;
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #fff;
+}
+
+button {
+  background-color: #0056b3;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-size: 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+button a {
+  color: white;
+  text-decoration: none;
+}
+
+button:hover {
+  background-color: #003d82;
+}
+
+/* Cobros container styles */
+#cobrosContainer {
+  margin: 20px auto;
+  padding: 20px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  max-width: 900px;
+}
+
+/* Table styles */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 16px;
+  background-color: #fff;
+}
+
+table th,
+table td {
+  border: 1px solid #ddd;
+  text-align: left;
+  padding: 8px;
+}
+
+table th {
+  background-color: #0056b3;
+  color: white;
+  text-align: center;
+}
+
+table tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+table tr:hover {
+  background-color: #f1f1f1;
+}
+
+/* Fieldset styles for grouping */
+fieldset {
+  border: 2px solid #0056b3;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+fieldset h2 {
+  color: #0056b3;
+  text-align: left;
+}
+
+/* Total cobros */
+#cobrosContainer h3 {
+  color: #0056b3;
+  font-weight: bold;
+  text-align: center;
+  margin-top: 20px;
+}
+
+/* Responsive design */
+@media screen and (max-width: 600px) {
+  table {
+    font-size: 14px;
+  }
+
+  button {
+    font-size: 14px;
+    padding: 8px 16px;
+  }
+}

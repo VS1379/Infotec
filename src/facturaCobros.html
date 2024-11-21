@@ -27,6 +27,7 @@
       background-color: #f2f2f2;
     }
   </style>
+  <link rel="stylesheet" href="factura.css">
 </head>
 
 <body>
@@ -51,7 +52,6 @@
 
       <label for="cheque">Cheque:</label>
       <input type="checkbox" id="cheque" onchange="toggleChequeFields()" />
-      <br /><br />
 
       <div id="chequeFields" style="display: none">
         <label for="banco">Banco:</label>
@@ -140,7 +140,9 @@
   </form>
 
   <br />
-  <a href="facturaIndex.html">Volver al inicio</a>
+  <button type="button" class="btn volver">
+    <a href="facturaIndex.html">Volver al inicio</a>
+  </button>
   <br />
 
   <script src="scriptsFacturaCobros.js"></script>

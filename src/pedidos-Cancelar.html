@@ -1,41 +1,61 @@
 <div id="pedidosSection">
   <h1>Lista de Pedidos</h1>
+  <link rel="stylesheet" href="./styles/index.css" />
   <style>
     table {
-      width: 100%;
+      width: 90%;
       border-collapse: collapse;
+      margin-left: 5%;
     }
+
     table,
     th,
     td {
       border: 1px solid black;
     }
+
     th,
     td {
       padding: 10px;
       text-align: center;
     }
+
     th {
       background-color: #f2f2f2;
     }
+
     button {
-        display: flex;
-        border-radius: 2px;
-        margin: auto;
-        background-color: red;
-        color: black  ;
+      display: flex;
+      border-radius: 2px;
+      margin: auto;
+      background-color: red;
+      color: black;
     }
   </style>
   <table>
     <thead>
       <tr>
-        <th><h3>Item</h4></th>
-        <th><h3>ID Pedido</h3></th>
-        <th><h3>ID Cliente</h3></th>
-        <th><h3>Fecha y Hora</h3></th>
-        <th><h3>Condicion</h3></th>
-        <th><h3>Tipo de Pedido</h3></th>
-        <th><h3></h3></th>
+        <th>
+          <h3>Item</h4>
+        </th>
+        <th>
+          <h3>ID Pedido</h3>
+        </th>
+        <th>
+          <h3>ID Cliente</h3>
+        </th>
+        <th>
+          <h3>Fecha y Hora</h3>
+        </th>
+        <th>
+          <h3>Condicion</h3>
+        </th>
+        <th>
+          <h3>Tipo de Pedido</h3>
+        </th>
+        <th>
+          <h3></h3>
+        </th>
       </tr>
     </thead>
     <tbody id="pedidosContainer">
@@ -44,6 +64,8 @@
   </table>
 </div>
 <br>
-    <a href="pedidos-index.html">Volver a Pedidos</a> 
-    <br/>
+<button class="btn volver">
+  <a href="pedidos-index.html">Volver a Pedidos</a>
+</button>
+<br />
 <script src="scriptsPedidos-Cancelar.js"></script>

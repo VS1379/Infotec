@@ -1,8 +1,8 @@
-// scriptsClientesListado.js
-
 document.addEventListener("DOMContentLoaded", function () {
   cargarClientes();
+
 });
+
 
 async function cargarClientes() {
   try {
@@ -19,8 +19,8 @@ async function cargarClientes() {
       <table>
         <tbody>
           ${clientesArray
-            .map(
-              (cliente) => `
+        .map(
+          (cliente) => `
             <tr>
             
             <td>${(i += 1)}</td>
@@ -32,8 +32,8 @@ async function cargarClientes() {
               <td>${cliente.CORREO}</td>
             </tr>
             `
-            )
-            .join("")}
+        )
+        .join("")}
           </tbody>
       </table>
           
@@ -50,3 +50,42 @@ async function cargarClientes() {
       "<p>Error al cargar los clientes.</p>";
   }
 }
+// Función para imprimir el informe
+function imprimirInforme() {
+  // Capturamos el contenido de la tabla
+  const tabla = document.querySelector("table").outerHTML;
+
+  // Creamos una nueva ventana para imprimir
+  const ventana = window.open("", "_blank");
+  ventana.document.write(`
+    <html>
+      <head>
+        <title>Informe de Clientes</title>
+        <style>
+          table {
+            width: 100%;
+            border-collapse: collapse;
+          }
+          th, td {
+            border: 1px solid black;
+            text-align: left;
+            padding: 8px;
+          }
+          th {
+            background-color: #f2f2f2;
+          }
+        </style>
+      </head>
+      <body>
+        <h1>Informe de Clientes</h1>
+        ${tabla}
+      </body>
+    </html>
+  `);
+
+  // Imprimimos el contenido
+  ventana.document.close();
+  ventana.print();
+  ventana.close();
+}
+

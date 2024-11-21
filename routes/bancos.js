@@ -8,5 +8,7 @@ bancoRouter.get('/', bancoController.getAll);
 
 bancoRouter.post('/', bancoController.create);
 
-bancoRouter.delete('/', bancoController.delete);
+bancoRouter.delete('/:IdBanco', bancoController.delete);
+
+bancoRouter.patch('/:IdBanco', bancoController.update);
 

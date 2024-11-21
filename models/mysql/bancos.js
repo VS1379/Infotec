@@ -17,10 +17,9 @@ export class bancoModel {
   }
 
   static async crear(banco) {
-    const { descripcionBanco: nombre } = banco;
     const [result] = await connection.query(
       "INSERT INTO bancos (Nombre) VALUES (?)",
-      [nombre]
+      [banco.Nombre]
     );
     return result;
   }
@@ -31,5 +30,14 @@ export class bancoModel {
       [IdBanco]
     );
     return result.affectedRows > 0;
+  }
+
+  static async update(Idbanco, nombre) {
+    nombre = nombre.nombre
+    const [result] = await connection.query(
+      "UPDATE bancos SET Nombre = ? WHERE IdBanco = ?",
+      [nombre, Idbanco]
+    );
+    return result;
   }
 }
